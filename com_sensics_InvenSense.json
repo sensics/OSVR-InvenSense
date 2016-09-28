@@ -1,0 +1,23 @@
+{
+	"deviceVendor": "InvenSense",
+	"deviceName": "",
+	"author": "Georgiy Frolov <georgiy@sensics.com>",
+	"version": 1,
+	"lastModified": "",
+	"interfaces": {
+		"tracker": {
+			"count": 1,
+			"bounded": true,
+			"position": false,
+			"orientation": true
+		}
+	},
+	"semantic": {
+		"hmd": {
+			"$target": "tracker/0"
+		}
+	},
+	"automaticAliases": {
+		"/me/head": "semantic/hmd"
+	}
+}
