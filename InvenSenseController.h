@@ -32,12 +32,23 @@
 #include <osvr/Util/ReturnCodesC.h>
 #include <osvr/PluginKit/TrackerInterfaceC.h>
 
+#include "DeviceInstance.h"
+#include "SensorEventsPrinter.h"
+#include "DefaultOutputStream.h"
+#include "Invn/Devices/Client/AsyncSensorEventsListener.h"
+#include "Invn/Devices/Client/HostAdapterClient.h"
+#include "Invn/Devices/Client/DataEventPoller.h"
+#include "Invn/Devices/Client/WatchdogPoller.h"
+#include "Invn/Devices/Client/FileDeviceLogger.h"
+#include "Invn/Devices/Client/SensorEventsDispatcher.h"
+
 #include <memory>
 #include <iostream>
 #include <vector>
 #include <string>
 
-class InvenSenseController {
+class InvenSenseController : public DeviceDebuggerHook,
+                             public DeviceErrorHandler {
   public:
     InvenSenseController();
     ~InvenSenseController();
@@ -45,6 +56,16 @@ class InvenSenseController {
     OSVR_ReturnCode connect(const std::string &target, const std::string &port);
     OSVR_ReturnCode enableTracking();
     OSVR_ReturnCode getTracking(OSVR_OrientationState *data);
+
+    void handleDeviceError(DeviceClient *device, const std::exception &e);
+    void waitForDebugger(DeviceClient *device);
+
+    static void eventCb(const inv_sensor_event_t *event, void *arg);
+
+    SensorEventsDispatcher &getEventDispatcher();
+
+    /* pass events dispatcher (which is a listener) to device */
+    SensorEventsDispatcher event_dispatcher;
 
   private:
     enum Target {
@@ -98,6 +119,21 @@ class InvenSenseController {
 
     /* create device */
     std::auto_ptr<DeviceClient> device;
+
+    /* device logger */
+    FileDeviceLogger deviceLogger;
+
+    /* create singletons for other objects */
+    SensorEventsPrinter sensorEventPrinter;
+    DefaultOutputStream defaultStream;
+
+    /* Asynchronous listener of data event */
+    AsyncSensorEventsListener async_listener;
+
+    /* poller for data events */
+    DataEventPoller event_poller;
+    /* poller for watchdog */
+    WatchdogPoller watchdog_poller;
 };
 
 #endif // INCLUDED_InvenSenseController_h_GUID_A17C0750_8743_4F88_A39A_379043D485BC

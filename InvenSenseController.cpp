@@ -25,14 +25,6 @@
 // Internal Includes
 #include "InvenSenseController.h"
 
-#include "DeviceInstance.h"
-#include "SensorEventsPrinter.h"
-#include "DefaultOutputStream.h"
-
-#include "Invn/Devices/Client/AsyncSensorEventsListener.h"
-#include "Invn/Devices/Client/HostAdapterClient.h"
-#include "Invn/Devices/Client/DataEventPoller.h"
-#include "Invn/Devices/Client/WatchdogPoller.h"
 #include "Invn/Devices/Client/DeviceClientIcm30xxx.h"
 #include "Invn/Devices/Client/DeviceClientVanadiumEMD.h"
 #include "Invn/Devices/Client/DeviceClientIcm20648.h"
@@ -45,8 +37,6 @@
 #include "Invn/Devices/Client/DeviceClientEmdWrapIcm30xxx.h"
 #include "Invn/Devices/Client/DeviceClientGsh.h"
 #include "Invn/Devices/Client/DeviceClientChre.h"
-#include "Invn/Devices/Client/FileDeviceLogger.h"
-#include "Invn/Devices/Client/SensorEventsDispatcher.h"
 #include "Invn/Devices/HostAdapter/CheetahAdapter.h"
 
 #include <cassert>
@@ -57,14 +47,15 @@
 static const auto PREFIX = "[InvenSense] ";
 
 InvenSenseController::InvenSenseController()
-    : _serif_instance(0), _serif_instance_ois(0), _serif_instance_i2cslave(0){
-
-                                                  };
+    : _serif_instance(0), _serif_instance_ois(0), _serif_instance_i2cslave(0),
+      deviceLogger(""), event_poller(0), watchdog_poller(0){};
 
 InvenSenseController::~InvenSenseController() {
 
     try {
         /* clean-up device */
+        event_poller.stop();
+        watchdog_poller.stop();
         device->cleanup();
     } catch (const std::exception &e) {
         std::cerr << PREFIX << "Caught exception " << e.what()
@@ -93,7 +84,7 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
         return OSVR_RETURN_FAILURE;
     }
 
-    INV_MSG_SETUP(_msg_level, inv_msg_printer_default);
+    INV_MSG_SETUP(INV_MSG_LEVEL_DEBUG, inv_msg_printer_default);
 
     assert(_serif_instance.get());
 
@@ -142,12 +133,6 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
         }
     }
 
-    _device_logger_file = "";
-    _device_logger_level = "";
-
-    /* setup logger for device */
-    FileDeviceLogger deviceLogger(_device_logger_file);
-
     uint8_t selectedTarget = TARGET_EMDWRAPPER;
     switch (selectedTarget) {
     case TARGET_EMDWRAPPER:
@@ -161,21 +146,11 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
     /* set Device global instance */
     DeviceInstance::set(*device);
 
-    /* create singletons for other objects */
-    SensorEventsPrinter sensorEventPrinter;
-    DefaultOutputStream defaultStream;
-
-    /* pass events dispatcher (which is a listener) to device */
-    SensorEventsDispatcher event_dispatcher;
-
-    /* Asynchronous listener of data event */
-    AsyncSensorEventsListener async_listener;
-
     /* poller for data events */
-    // DataEventPoller event_poller(device.get());
+    DataEventPoller event_poller(device.get());
 
     /* poller for watchdog */
-    // WatchdogPoller watchdog_poller(device.get());
+    WatchdogPoller watchdog_poller(device.get());
 
     /* setup device */
     try {
@@ -186,15 +161,15 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
         async_listener.setListener(&event_dispatcher);
         device->setListener(&async_listener);
 
-        /*	if(_enable_target_debug) {
-                device->registerDebuggerHook(this);
-            }*/
+        if (_enable_target_debug) {
+            device->registerDebuggerHook(this);
+        }
         device->setup();
         async_listener.start();
-        /*	event_poller.registerErrorHandler(this);
-            event_poller.start();
-            watchdog_poller.registerErrorHandler(this);
-            watchdog_poller.start();*/
+        event_poller.registerErrorHandler(this);
+        event_poller.start();
+        watchdog_poller.registerErrorHandler(this);
+        watchdog_poller.start();
     } catch (const std::exception &e) {
         std::cerr << PREFIX << "Encountered exception " << e.what()
                   << " during device setup" << std::endl;
@@ -211,14 +186,7 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
 
 OSVR_ReturnCode InvenSenseController::enableTracking() {
 
-    /*int sensor, timeout;
-    long period;
-
-    sensor = 15;
-    period = -1;
-    timeout = -1;
-
-    DeviceInstance::get().startSensor(sensor);*/
+    device->startSensor(INV_SENSOR_TYPE_GAME_ROTATION_VECTOR);
 
     return OSVR_RETURN_SUCCESS;
 }
@@ -226,18 +194,29 @@ OSVR_ReturnCode InvenSenseController::enableTracking() {
 OSVR_ReturnCode InvenSenseController::getTracking(OSVR_OrientationState *data) {
 
     int sensor;
-    sensor = 15;
+    sensor = INV_SENSOR_TYPE_GAME_ROTATION_VECTOR;
     inv_sensor_event_t event;
-    DeviceInstance::get().getSensorData(sensor, event);
+    device->getSensorData(sensor, event);
     std::cout << "w: " << event.data.quaternion.quat[0]
               << "x: " << event.data.quaternion.quat[1]
               << "y: " << event.data.quaternion.quat[2]
               << "z: " << event.data.quaternion.quat[3] << std::endl;
-    /*printf("GET DATA %s (%d) t: %10llu data: ", inv_sensor_2str(event.sensor),
-                event.sensor, event.timestamp);
-    SensorEventsPrinter::instance().print(event, stdout);
-    printf("\n");
-    fflush(stdout);*/
 
     return OSVR_RETURN_SUCCESS;
+}
+
+void InvenSenseController::waitForDebugger(DeviceClient *device) {
+    std::cout << "waitForDebugger" << std::endl;
+}
+
+void InvenSenseController::handleDeviceError(DeviceClient *device,
+                                             const std::exception &e) {
+    (void)device;
+
+    std::cerr << "Got error " << e.what() << " while polling device."
+              << std::endl;
+}
+
+SensorEventsDispatcher &InvenSenseController::getEventDispatcher() {
+    return event_dispatcher;
 }
