@@ -26,6 +26,9 @@
 #include "com_sensics_InvenSense_json.h"
 #include "InvenSenseController.h"
 
+#include "Invn/Devices/Client/SensorEventsDispatcher.h"
+#include "Invn/HostUtils/NamedPipe.h"
+
 // Library/third-party includes
 #include <math.h>
 
@@ -41,10 +44,11 @@ namespace {
 static const auto PREFIX = "[OSVR-InvenSense] ";
 typedef std::shared_ptr<InvenSenseController> InvnCtlPtr;
 
-class InvenSenseDevice {
+class InvenSenseDevice : public SensorEventsListener {
   public:
+    ~InvenSenseDevice() { _dispatcher.unsubscribe(this); }
     InvenSenseDevice(OSVR_PluginRegContext ctx, InvnCtlPtr controller)
-        : m_controller(controller)
+        : m_controller(controller), _dispatcher(controller->event_dispatcher)
 
     {
         osvrTimeValueGetNow(&m_last);
@@ -61,14 +65,21 @@ class InvenSenseDevice {
 
         /// Register update callback
         m_dev.registerUpdateCallback(this);
+        _dispatcher.subscribe(this);
+
+        controller->enableTracking();
     }
 
     OSVR_ReturnCode InvenSenseDevice::update() {
 
         OSVR_OrientationState orientation;
-        m_controller->getTracking(&orientation);
+        // m_controller->getTracking(&orientation);
 
         return OSVR_RETURN_SUCCESS;
+    }
+
+    void InvenSenseDevice::notify(const inv_sensor_event_t &event) {
+        std::cout << PREFIX << "Yay got an event " << std::endl;
     }
 
   private:
@@ -76,6 +87,7 @@ class InvenSenseDevice {
     OSVR_TrackerDeviceInterface m_tracker;
     InvnCtlPtr m_controller;
     OSVR_TimeValue m_last;
+    SensorEventsDispatcher &_dispatcher;
 };
 
 class HardwareDetection {
@@ -92,7 +104,7 @@ class HardwareDetection {
             std::cout << "PLUGIN: We have detected InvenSense device! "
                       << std::endl;
             m_found = true;
-            ret = controller->enableTracking();
+
             /// Create our device object
             osvr::pluginkit::registerObjectForDeletion(
                 ctx, new InvenSenseDevice(ctx, controller));
