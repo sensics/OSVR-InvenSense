@@ -57,7 +57,9 @@
 static const auto PREFIX = "[InvenSense] ";
 
 InvenSenseController::InvenSenseController()
-    : _serif_instance(0), _serif_instance_ois(0), _serif_instance_i2cslave(0){};
+    : _serif_instance(0), _serif_instance_ois(0), _serif_instance_i2cslave(0){
+
+                                                  };
 
 InvenSenseController::~InvenSenseController() {
 
@@ -76,6 +78,20 @@ InvenSenseController::~InvenSenseController() {
 
 OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
                                               const std::string &port) {
+
+    const std::string &adapter = "dummy";
+    const std::string &name = "adapter";
+
+    std::auto_ptr<HostAdapterClient> &ref_serif_instance =
+        (name == "adapter") ? _serif_instance : (name == "adapter2")
+                                                    ? _serif_instance_ois
+                                                    : _serif_instance_i2cslave;
+
+    ref_serif_instance.reset(HostAdapterClient::factoryCreate(adapter));
+    if (!ref_serif_instance.get()) {
+        std::cerr << "Adapter " << adapter << " unknown. Aborting" << std::endl;
+        return OSVR_RETURN_FAILURE;
+    }
 
     INV_MSG_SETUP(_msg_level, inv_msg_printer_default);
 
@@ -156,10 +172,10 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
     AsyncSensorEventsListener async_listener;
 
     /* poller for data events */
-    DataEventPoller event_poller(device.get());
+    // DataEventPoller event_poller(device.get());
 
     /* poller for watchdog */
-    WatchdogPoller watchdog_poller(device.get());
+    // WatchdogPoller watchdog_poller(device.get());
 
     /* setup device */
     try {
@@ -189,6 +205,39 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
                   << std::endl;
         return OSVR_RETURN_FAILURE;
     }
+
+    return OSVR_RETURN_SUCCESS;
+}
+
+OSVR_ReturnCode InvenSenseController::enableTracking() {
+
+    /*int sensor, timeout;
+    long period;
+
+    sensor = 15;
+    period = -1;
+    timeout = -1;
+
+    DeviceInstance::get().startSensor(sensor);*/
+
+    return OSVR_RETURN_SUCCESS;
+}
+
+OSVR_ReturnCode InvenSenseController::getTracking(OSVR_OrientationState *data) {
+
+    int sensor;
+    sensor = 15;
+    inv_sensor_event_t event;
+    DeviceInstance::get().getSensorData(sensor, event);
+    std::cout << "w: " << event.data.quaternion.quat[0]
+              << "x: " << event.data.quaternion.quat[1]
+              << "y: " << event.data.quaternion.quat[2]
+              << "z: " << event.data.quaternion.quat[3] << std::endl;
+    /*printf("GET DATA %s (%d) t: %10llu data: ", inv_sensor_2str(event.sensor),
+                event.sensor, event.timestamp);
+    SensorEventsPrinter::instance().print(event, stdout);
+    printf("\n");
+    fflush(stdout);*/
 
     return OSVR_RETURN_SUCCESS;
 }
