@@ -22,6 +22,7 @@
 // Internal Includes
 #include <osvr/PluginKit/PluginKit.h>
 #include <osvr/Util/PlatformConfig.h>
+#include <osvr/PluginKit/TrackerInterfaceC.h>
 #include "com_sensics_InvenSense_json.h"
 #include "InvenSenseController.h"
 
@@ -40,22 +41,73 @@ namespace {
 static const auto PREFIX = "[OSVR-InvenSense] ";
 typedef std::shared_ptr<InvenSenseController> InvnCtlPtr;
 
-class HardwareDetection {
-
+class InvenSenseDevice {
   public:
-    HardwareDetection() {}
+    InvenSenseDevice(OSVR_PluginRegContext ctx, InvnCtlPtr controller)
+        : m_controller(controller)
 
-    OSVR_ReturnCode operator()(OSVR_PluginRegContext ctx) {
+    {
+        osvrTimeValueGetNow(&m_last);
+        /// Create the initialization options
+        OSVR_DeviceInitOptions opts = osvrDeviceCreateInitOptions(ctx);
 
-        InvenSenseController controller;
-        controller.connect("emdwrapper", "COM13");
+        osvrDeviceTrackerConfigure(opts, &m_tracker);
+
+        /// Create the sync device token with the options
+        m_dev.initSync(ctx, "InvenSense", opts);
+
+        /// Send JSON descriptor
+        m_dev.sendJsonDescriptor(com_sensics_InvenSense_json);
+
+        /// Register update callback
+        m_dev.registerUpdateCallback(this);
+    }
+
+    OSVR_ReturnCode InvenSenseDevice::update() {
+
+        OSVR_OrientationState orientation;
+        m_controller->getTracking(&orientation);
 
         return OSVR_RETURN_SUCCESS;
     }
 
   private:
-    // InvnCtlPtr controller;
-    bool mFound;
+    osvr::pluginkit::DeviceToken m_dev;
+    OSVR_TrackerDeviceInterface m_tracker;
+    InvnCtlPtr m_controller;
+    OSVR_TimeValue m_last;
+};
+
+class HardwareDetection {
+
+  public:
+    HardwareDetection()
+        : controller(new InvenSenseController()), m_found(false) {}
+
+    OSVR_ReturnCode operator()(OSVR_PluginRegContext ctx) {
+
+        OSVR_ReturnCode ret = controller->connect("emdwrapper", "COM13");
+
+        if (ret == OSVR_RETURN_SUCCESS) {
+            std::cout << "PLUGIN: We have detected InvenSense device! "
+                      << std::endl;
+            m_found = true;
+            ret = controller->enableTracking();
+            /// Create our device object
+            osvr::pluginkit::registerObjectForDeletion(
+                ctx, new InvenSenseDevice(ctx, controller));
+        } else {
+            std::cout << PREFIX << "We have NOT detected InvenSense tracker "
+                      << std::endl;
+            return OSVR_RETURN_FAILURE;
+        }
+
+        return OSVR_RETURN_SUCCESS;
+    }
+
+  private:
+    InvnCtlPtr controller;
+    bool m_found;
 };
 } // namespace
 
