@@ -30,6 +30,7 @@
 #include "Invn/EmbUtils/Message.h"
 #include "Poco/Util/Application.h"
 #include <osvr/Util/ReturnCodesC.h>
+#include <osvr/PluginKit/TrackerInterfaceC.h>
 
 #include <memory>
 #include <iostream>
@@ -42,6 +43,9 @@ class InvenSenseController {
     ~InvenSenseController();
 
     OSVR_ReturnCode connect(const std::string &target, const std::string &port);
+    OSVR_ReturnCode enableTracking();
+    OSVR_ReturnCode getTracking(OSVR_OrientationState *data);
+    
 
   private:
     enum Target {
