@@ -146,11 +146,8 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
     /* set Device global instance */
     DeviceInstance::set(*device);
 
-    /* poller for data events */
-    DataEventPoller event_poller(device.get());
-
-    /* poller for watchdog */
-    WatchdogPoller watchdog_poller(device.get());
+	event_poller.setDevice(device.get());
+	watchdog_poller.setDevice(device.get());
 
     /* setup device */
     try {
