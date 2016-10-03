@@ -48,7 +48,8 @@ class InvenSenseDevice : public SensorEventsListener {
   public:
     ~InvenSenseDevice() { _dispatcher.unsubscribe(this); }
     InvenSenseDevice(OSVR_PluginRegContext ctx, InvnCtlPtr controller)
-        : m_controller(controller), _dispatcher(controller->event_dispatcher)
+        : m_controller(controller),
+          _dispatcher(controller->getEventDispatcher())
 
     {
         osvrTimeValueGetNow(&m_last);
@@ -67,19 +68,22 @@ class InvenSenseDevice : public SensorEventsListener {
         m_dev.registerUpdateCallback(this);
         _dispatcher.subscribe(this);
 
-        controller->enableTracking();
+        controller->enableGRV();
     }
 
-    OSVR_ReturnCode InvenSenseDevice::update() {
-
-        OSVR_OrientationState orientation;
-        // m_controller->getTracking(&orientation);
-
-        return OSVR_RETURN_SUCCESS;
-    }
+    OSVR_ReturnCode InvenSenseDevice::update() { return OSVR_RETURN_SUCCESS; }
 
     void InvenSenseDevice::notify(const inv_sensor_event_t &event) {
-        std::cout << PREFIX << "Yay got an event " << std::endl;
+
+        OSVR_OrientationState orientation;
+        orientation.data[0] = event.data.quaternion.quat[0];
+        orientation.data[1] = event.data.quaternion.quat[1];
+        orientation.data[2] = event.data.quaternion.quat[2];
+        orientation.data[3] = event.data.quaternion.quat[3];
+        OSVR_TimeValue timestamp;
+        osvrTimeValueGetNow(&timestamp);
+        osvrDeviceTrackerSendOrientationTimestamped(
+            m_dev, m_tracker, &orientation, 0, &timestamp);
     }
 
   private:
@@ -98,18 +102,22 @@ class HardwareDetection {
 
     OSVR_ReturnCode operator()(OSVR_PluginRegContext ctx) {
 
-        OSVR_ReturnCode ret = controller->connect("emdwrapper", "COM13");
+        if (m_found) {
+            return OSVR_RETURN_SUCCESS;
+        }
+
+        OSVR_ReturnCode ret =
+            controller->connect("emdwrapper", "COM13", "dummy", "adapter");
 
         if (ret == OSVR_RETURN_SUCCESS) {
-            std::cout << "PLUGIN: We have detected InvenSense device! "
-                      << std::endl;
+            std::cout << PREFIX << "Detected InvenSense device! " << std::endl;
             m_found = true;
 
             /// Create our device object
             osvr::pluginkit::registerObjectForDeletion(
                 ctx, new InvenSenseDevice(ctx, controller));
         } else {
-            std::cout << PREFIX << "We have NOT detected InvenSense tracker "
+            std::cout << PREFIX << "NOT detected InvenSense tracker "
                       << std::endl;
             return OSVR_RETURN_FAILURE;
         }
