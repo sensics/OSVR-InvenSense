@@ -53,19 +53,31 @@ class InvenSenseController : public DeviceDebuggerHook,
     InvenSenseController();
     ~InvenSenseController();
 
-    OSVR_ReturnCode connect(const std::string &target, const std::string &port);
-    OSVR_ReturnCode enableTracking();
-    OSVR_ReturnCode getTracking(OSVR_OrientationState *data);
+    /*
+    @brief Establishes a connection to the device and sets up callbacks
+    */
+    OSVR_ReturnCode connect(const std::string &target, const std::string &port,
+                            const std::string &adapter,
+                            const std::string &name);
 
+    /*
+    @brief Enables game rotation vector sensor
+    */
+    OSVR_ReturnCode enableGRV();
+
+    /*
+    @brief Implements required function for DeviceErrorHandler
+    */
     void handleDeviceError(DeviceClient *device, const std::exception &e);
+
+    /*
+    @brief Implements required function for DeviceDebuggerHook
+    */
     void waitForDebugger(DeviceClient *device);
 
     static void eventCb(const inv_sensor_event_t *event, void *arg);
 
     SensorEventsDispatcher &getEventDispatcher();
-
-    /* pass events dispatcher (which is a listener) to device */
-    SensorEventsDispatcher event_dispatcher;
 
   private:
     enum Target {
@@ -91,28 +103,13 @@ class InvenSenseController : public DeviceDebuggerHook,
         TARGET_PROXY_CMODEL,
     };
 
-    // ExitCode					_exit_code;
     bool _enable_target_debug;
     Target _selected_target;
-    TargetProxy _selected_target_proxy;
-    int _msg_level;
-    bool _fw_image_force;
-    bool _fw_image_verify;
-    std::vector<std::string> _commands_from_argv;
-    std::string _fw_image_path;
-    std::string _fw_ram_image_path;
-    std::string _dmp3_image_path;
-    std::string _dmp4_image_path;
-    std::string _zsp_imem_image_path;
-    std::string _zsp_dmem_image_path;
-    std::string _device_logger_file;
-    std::string _device_logger_level;
     std::auto_ptr<HostAdapterClient> _serif_instance;
     std::auto_ptr<HostAdapterClient> _serif_instance_ois;
     std::auto_ptr<HostAdapterClient> _serif_instance_i2cslave;
 
-    const std::string mPort;
-    const std::string mTarget;
+    bool devSetupComplete;
 
     /* device locker */
     DeviceLocker devLocker;
@@ -134,6 +131,9 @@ class InvenSenseController : public DeviceDebuggerHook,
     DataEventPoller event_poller;
     /* poller for watchdog */
     WatchdogPoller watchdog_poller;
+
+    /* pass events dispatcher (which is a listener) to device */
+    SensorEventsDispatcher event_dispatcher;
 };
 
 #endif // INCLUDED_InvenSenseController_h_GUID_A17C0750_8743_4F88_A39A_379043D485BC

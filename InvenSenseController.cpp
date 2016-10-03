@@ -48,30 +48,33 @@ static const auto PREFIX = "[InvenSense] ";
 
 InvenSenseController::InvenSenseController()
     : _serif_instance(0), _serif_instance_ois(0), _serif_instance_i2cslave(0),
-      deviceLogger(""), event_poller(0), watchdog_poller(0){};
+      deviceLogger(""), event_poller(0), watchdog_poller(0),
+      devSetupComplete(false){};
 
 InvenSenseController::~InvenSenseController() {
 
-    try {
-        /* clean-up device */
-        event_poller.stop();
-        watchdog_poller.stop();
-        device->cleanup();
-    } catch (const std::exception &e) {
-        std::cerr << PREFIX << "Caught exception " << e.what()
-                  << "on device clean-up" << std::endl;
+    if (devSetupComplete) {
+        try {
+            /* clean-up device */
+            event_poller.stop();
+            watchdog_poller.stop();
+            device->cleanup();
+        } catch (const std::exception &e) {
+            std::cerr << PREFIX << "Caught exception " << e.what()
+                      << "on device clean-up" << std::endl;
 
-    } catch (...) {
-        std::cerr << PREFIX << "Caught undefined exception on device clean-up"
-                  << std::endl;
+        } catch (...) {
+            std::cerr << PREFIX
+                      << "Caught undefined exception on device clean-up"
+                      << std::endl;
+        }
     }
 };
 
 OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
-                                              const std::string &port) {
-
-    const std::string &adapter = "dummy";
-    const std::string &name = "adapter";
+                                              const std::string &port,
+                                              const std::string &adapter,
+                                              const std::string &name) {
 
     std::auto_ptr<HostAdapterClient> &ref_serif_instance =
         (name == "adapter") ? _serif_instance : (name == "adapter2")
@@ -91,7 +94,7 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
     try {
         _serif_instance->open();
     } catch (const std::exception &e) {
-        std::cerr << PREFIX << PREFIX << "Caught exception" << e.what()
+        std::cerr << PREFIX << "Caught exception" << e.what()
                   << "while openning serial interface" << std::endl;
         return OSVR_RETURN_FAILURE;
     } catch (...) {
@@ -133,8 +136,8 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
         }
     }
 
-    uint8_t selectedTarget = TARGET_EMDWRAPPER;
-    switch (selectedTarget) {
+    _selected_target = TARGET_EMDWRAPPER;
+    switch (_selected_target) {
     case TARGET_EMDWRAPPER:
         device.reset(new DeviceClientEmdWrapper(port));
         break;
@@ -146,8 +149,8 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
     /* set Device global instance */
     DeviceInstance::set(*device);
 
-	event_poller.setDevice(device.get());
-	watchdog_poller.setDevice(device.get());
+    event_poller.setDevice(device.get());
+    watchdog_poller.setDevice(device.get());
 
     /* setup device */
     try {
@@ -167,6 +170,7 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
         event_poller.start();
         watchdog_poller.registerErrorHandler(this);
         watchdog_poller.start();
+        devSetupComplete = true;
     } catch (const std::exception &e) {
         std::cerr << PREFIX << "Encountered exception " << e.what()
                   << " during device setup" << std::endl;
@@ -181,23 +185,9 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
     return OSVR_RETURN_SUCCESS;
 }
 
-OSVR_ReturnCode InvenSenseController::enableTracking() {
+OSVR_ReturnCode InvenSenseController::enableGRV() {
 
     device->startSensor(INV_SENSOR_TYPE_GAME_ROTATION_VECTOR);
-
-    return OSVR_RETURN_SUCCESS;
-}
-
-OSVR_ReturnCode InvenSenseController::getTracking(OSVR_OrientationState *data) {
-
-    int sensor;
-    sensor = INV_SENSOR_TYPE_GAME_ROTATION_VECTOR;
-    inv_sensor_event_t event;
-    device->getSensorData(sensor, event);
-    std::cout << "w: " << event.data.quaternion.quat[0]
-              << "x: " << event.data.quaternion.quat[1]
-              << "y: " << event.data.quaternion.quat[2]
-              << "z: " << event.data.quaternion.quat[3] << std::endl;
 
     return OSVR_RETURN_SUCCESS;
 }
