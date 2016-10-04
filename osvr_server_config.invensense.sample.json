@@ -1,2 +1,12 @@
 {
+	"aliases": {
+		"/me/head": {
+			"changeBasis": {
+				"x": "-x",
+				"y": "-z",
+				"z": "y"
+			},
+			"child": "/com_sensics_InvenSense/InvenSense/tracker/0"
+		}
+	}
 }
