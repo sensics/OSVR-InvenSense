@@ -31,6 +31,8 @@
 
 // Library/third-party includes
 #include <math.h>
+#include <json/reader.h>
+#include <json/value.h>
 
 // Standard includes
 #include <deque>
@@ -41,8 +43,12 @@
 // Anonymous namespace to avoid symbol collision
 namespace {
 
+static const auto DRIVER_NAME = "OSVR_InvenSense";
 static const auto PREFIX = "[OSVR-InvenSense] ";
 typedef std::shared_ptr<InvenSenseController> InvnCtlPtr;
+
+inline const std::string getTargetDefault() { return "emdwrapper"; }
+inline const std::string getAdapterDefault() { return "dummy"; }
 
 class InvenSenseDevice : public SensorEventsListener {
   public:
@@ -94,22 +100,67 @@ class InvenSenseDevice : public SensorEventsListener {
     SensorEventsDispatcher &_dispatcher;
 };
 
-class HardwareDetection {
+class InvenSensePluginInstantiation {
 
   public:
-    HardwareDetection()
-        : controller(new InvenSenseController()), m_found(false) {}
+    InvenSensePluginInstantiation() : m_found(false) {}
 
-    OSVR_ReturnCode operator()(OSVR_PluginRegContext ctx) {
+    OSVR_ReturnCode operator()(OSVR_PluginRegContext ctx, const char *params) {
 
         if (m_found) {
             return OSVR_RETURN_SUCCESS;
         }
 
-        OSVR_ReturnCode ret =
-            controller->connect("emdwrapper", "COM13", "dummy", "adapter");
+        Json::Value root;
+        {
+            Json::Reader reader;
+            if (!reader.parse(params, root)) {
+                std::cerr << PREFIX
+                          << "Could not parse JSON for OSVR InvenSense plugin"
+                          << std::endl;
+                return OSVR_RETURN_FAILURE;
+            }
+        }
 
-        if (ret == OSVR_RETURN_SUCCESS) {
+        std::string portParam, targetParam, adapterParam;
+        if (!root.isMember("port")) {
+            std::cerr << PREFIX << "Could not find port parameter. Verify that "
+                                   "port is specified in the config file"
+                      << std::endl;
+            return OSVR_RETURN_FAILURE;
+        } else {
+            portParam = root["port"].asString();
+            if (portParam.empty()) {
+                std::cerr << PREFIX
+                          << "Could not find port value. Verify that port "
+                             "value is specified in the config file"
+                          << std::endl;
+                return OSVR_RETURN_FAILURE;
+            }
+        }
+
+        if (!root.isMember("target")) {
+            targetParam = getTargetDefault();
+            std::cout << PREFIX
+                      << "Could not find target param. Using default \""
+                      << targetParam << "\" parameter" << std::endl;
+        } else {
+            targetParam = root["target"].asString();
+        }
+
+        if (!root.isMember("adapter")) {
+            adapterParam = getAdapterDefault();
+            std::cout << PREFIX
+                      << "Could not find adapter param. Using default \""
+                      << targetParam << "\" parameter" << std::endl;
+        } else {
+            adapterParam = root["adapter"].asString();
+        }
+
+        controller = std::shared_ptr<InvenSenseController>(
+            new InvenSenseController(targetParam, portParam, adapterParam));
+
+        if (controller->isDeviceConnected()) {
             std::cout << PREFIX << "Detected InvenSense device! " << std::endl;
             m_found = true;
 
@@ -135,7 +186,8 @@ OSVR_PLUGIN(com_sensics_InvenSense) {
     osvr::pluginkit::PluginContext context(ctx);
 
     /// Register a detection callback function object.
-    context.registerHardwareDetectCallback(new HardwareDetection());
+    context.registerDriverInstantiationCallback(
+        DRIVER_NAME, InvenSensePluginInstantiation());
 
     return OSVR_RETURN_SUCCESS;
 }
