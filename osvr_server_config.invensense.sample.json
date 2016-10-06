@@ -1,4 +1,15 @@
 {
+	"drivers": [{
+		"plugin": "com_sensics_InvenSense",
+		"driver": "OSVR_InvenSense",
+		"params": {
+            "target": "emwrapper",
+            "adapter": "dummy",
+            "port": "COM13"
+		}
+	}],
+	"display": "displays/OSVR_HDK_2_0.json",
+	"renderManagerConfig": "sample-configs/renderManager.direct.landscape.HDKv2.0.json",
 	"aliases": {
 		"/me/head": {
 			"changeBasis": {
