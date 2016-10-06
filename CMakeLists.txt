@@ -8,6 +8,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(osvr REQUIRED)
 find_package(invn REQUIRED)
+find_package(jsoncpp REQUIRED)
 
 # Generate our JSON header file
 osvr_convert_json(com_sensics_InvenSense_json
@@ -75,7 +76,8 @@ target_link_libraries(com_sensics_InvenSense
     PocoFoundation_s
     PocoJSON_s
     ws2_32
-    iphlpapi)
+    iphlpapi
+    jsoncpp_lib)
 
 # Install docs, license, sample config
 install(FILES
