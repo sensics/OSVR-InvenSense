@@ -46,14 +46,29 @@
 
 static const auto PREFIX = "[InvenSense] ";
 
+/*
 InvenSenseController::InvenSenseController()
     : _serif_instance(0), _serif_instance_ois(0), _serif_instance_i2cslave(0),
       deviceLogger(""), event_poller(0), watchdog_poller(0),
-      devSetupComplete(false){};
+      deviceConnected(false){};
+      */
+InvenSenseController::InvenSenseController(const std::string &target,
+                                           const std::string &port,
+                                           const std::string &adapter)
+    : _serif_instance(0), _serif_instance_ois(0), _serif_instance_i2cslave(0),
+      deviceLogger(""), event_poller(0), watchdog_poller(0),
+      deviceConnected(false), mTarget(target), mPort(port), mAdapter(adapter) {
+
+    OSVR_ReturnCode ret = setupDevice();
+
+    if (ret == OSVR_RETURN_SUCCESS) {
+        deviceConnected = true;
+    }
+}
 
 InvenSenseController::~InvenSenseController() {
 
-    if (devSetupComplete) {
+    if (deviceConnected) {
         try {
             /* clean-up device */
             event_poller.stop();
@@ -71,19 +86,14 @@ InvenSenseController::~InvenSenseController() {
     }
 };
 
-OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
-                                              const std::string &port,
-                                              const std::string &adapter,
-                                              const std::string &name) {
+OSVR_ReturnCode InvenSenseController::setupDevice() {
 
-    std::auto_ptr<HostAdapterClient> &ref_serif_instance =
-        (name == "adapter") ? _serif_instance : (name == "adapter2")
-                                                    ? _serif_instance_ois
-                                                    : _serif_instance_i2cslave;
+    std::auto_ptr<HostAdapterClient> &ref_serif_instance = _serif_instance;
 
-    ref_serif_instance.reset(HostAdapterClient::factoryCreate(adapter));
+    ref_serif_instance.reset(HostAdapterClient::factoryCreate(mAdapter));
     if (!ref_serif_instance.get()) {
-        std::cerr << "Adapter " << adapter << " unknown. Aborting" << std::endl;
+        std::cerr << "Adapter " << mAdapter << " unknown. Aborting"
+                  << std::endl;
         return OSVR_RETURN_FAILURE;
     }
 
@@ -139,7 +149,7 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
     _selected_target = TARGET_EMDWRAPPER;
     switch (_selected_target) {
     case TARGET_EMDWRAPPER:
-        device.reset(new DeviceClientEmdWrapper(port));
+        device.reset(new DeviceClientEmdWrapper(mPort));
         break;
     default:
         assert(0);
@@ -170,7 +180,7 @@ OSVR_ReturnCode InvenSenseController::connect(const std::string &target,
         event_poller.start();
         watchdog_poller.registerErrorHandler(this);
         watchdog_poller.start();
-        devSetupComplete = true;
+        deviceConnected = true;
     } catch (const std::exception &e) {
         std::cerr << PREFIX << "Encountered exception " << e.what()
                   << " during device setup" << std::endl;
@@ -207,3 +217,5 @@ void InvenSenseController::handleDeviceError(DeviceClient *device,
 SensorEventsDispatcher &InvenSenseController::getEventDispatcher() {
     return event_dispatcher;
 }
+
+bool InvenSenseController::isDeviceConnected() { return deviceConnected; }

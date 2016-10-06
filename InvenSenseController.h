@@ -50,15 +50,9 @@
 class InvenSenseController : public DeviceDebuggerHook,
                              public DeviceErrorHandler {
   public:
-    InvenSenseController();
+    InvenSenseController(const std::string &target, const std::string &port,
+                         const std::string &adapter);
     ~InvenSenseController();
-
-    /*
-    @brief Establishes a connection to the device and sets up callbacks
-    */
-    OSVR_ReturnCode connect(const std::string &target, const std::string &port,
-                            const std::string &adapter,
-                            const std::string &name);
 
     /*
     @brief Enables game rotation vector sensor
@@ -79,7 +73,14 @@ class InvenSenseController : public DeviceDebuggerHook,
 
     SensorEventsDispatcher &getEventDispatcher();
 
+    bool isDeviceConnected();
+
   private:
+    /*
+    @brief Establishes a connection to the device and sets up callbacks
+    */
+    OSVR_ReturnCode setupDevice();
+
     enum Target {
         TARGET_NONE,
         TARGET_DUMMY,
@@ -109,7 +110,7 @@ class InvenSenseController : public DeviceDebuggerHook,
     std::auto_ptr<HostAdapterClient> _serif_instance_ois;
     std::auto_ptr<HostAdapterClient> _serif_instance_i2cslave;
 
-    bool devSetupComplete;
+    bool deviceConnected;
 
     /* device locker */
     DeviceLocker devLocker;
@@ -134,6 +135,10 @@ class InvenSenseController : public DeviceDebuggerHook,
 
     /* pass events dispatcher (which is a listener) to device */
     SensorEventsDispatcher event_dispatcher;
+
+    const std::string mAdapter;
+    const std::string mPort;
+    const std::string mTarget;
 };
 
 #endif // INCLUDED_InvenSenseController_h_GUID_A17C0750_8743_4F88_A39A_379043D485BC
