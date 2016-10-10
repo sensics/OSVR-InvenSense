@@ -77,7 +77,7 @@ class InvenSenseDevice : public SensorEventsListener {
         m_dev.registerUpdateCallback(this);
         _dispatcher.subscribe(this);
 
-        controller->enableGRV();
+        controller->enableSensor(INV_SENSOR_TYPE_GAME_ROTATION_VECTOR);
     }
 
     OSVR_ReturnCode InvenSenseDevice::update() { return OSVR_RETURN_SUCCESS; }

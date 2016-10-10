@@ -55,9 +55,9 @@ class InvenSenseController : public DeviceDebuggerHook,
     ~InvenSenseController();
 
     /*
-    @brief Enables game rotation vector sensor
+    @brief Enables sensor specified by sensor ID
     */
-    OSVR_ReturnCode enableGRV();
+    OSVR_ReturnCode enableSensor(int sensorID);
 
     /*
     @brief Implements required function for DeviceErrorHandler

@@ -195,9 +195,9 @@ OSVR_ReturnCode InvenSenseController::setupDevice() {
     return OSVR_RETURN_SUCCESS;
 }
 
-OSVR_ReturnCode InvenSenseController::enableGRV() {
+OSVR_ReturnCode InvenSenseController::enableSensor(int sensorID) {
 
-    device->startSensor(INV_SENSOR_TYPE_GAME_ROTATION_VECTOR);
+    device->startSensor(sensorID);
 
     return OSVR_RETURN_SUCCESS;
 }
