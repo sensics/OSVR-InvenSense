@@ -23,7 +23,9 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/vendor/invn/sources")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/vendor/invn/external/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/vendor/invn/external/sources")
 
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/quat")
 
+add_subdirectory(quat)
 
 # Build and install the plugin
 osvr_add_plugin(com_sensics_InvenSense
@@ -77,7 +79,8 @@ target_link_libraries(com_sensics_InvenSense
     PocoJSON_s
     ws2_32
     iphlpapi
-    jsoncpp_lib)
+    jsoncpp_lib
+    quat)
 
 # Install docs, license, sample config
 install(FILES
