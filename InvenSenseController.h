@@ -81,23 +81,23 @@ class InvenSenseController : public DeviceDebuggerHook,
     */
     OSVR_ReturnCode setupDevice();
 
-    enum Target {
-        TARGET_NONE,
-        TARGET_DUMMY,
-        TARGET_ICM3063X,
-        TARGET_ICM30670,
-        TARGET_VANADIUMEMD,
-        TARGET_ICM20648,
-        TARGET_ICM20948,
-        TARGET_BERLIN,
-        TARGET_ICM20602,
-        TARGET_ICM20603,
-        TARGET_ICM20690,
-        TARGET_EMDWRAPPER,
-        TARGET_EMDWRAP_ICM30XXX,
-        TARGET_CHRE,
-        TARGET_GSH,
-    };
+	enum Target {
+		TARGET_NONE,
+		TARGET_DUMMY,
+		TARGET_ICM3063X,
+		TARGET_ICM30670,
+		TARGET_VANADIUMEMD,
+		TARGET_ICM20648,
+		TARGET_ICM20948,
+		TARGET_BERLIN,
+		TARGET_ICM20602,
+		TARGET_ICM20603,
+		TARGET_ICM20690,
+		TARGET_EMDWRAP_ICM20XXX,
+		TARGET_EMDWRAP_ICM30XXX,
+		TARGET_CHRE,
+		TARGET_GSH,
+	};
 
     enum TargetProxy {
         TARGET_PROXY_NONE,

@@ -33,7 +33,7 @@
 #include "Invn/Devices/Client/DeviceClientIcm20602.h"
 #include "Invn/Devices/Client/DeviceClientIcm20603.h"
 #include "Invn/Devices/Client/DeviceClientIcm20690.h"
-#include "Invn/Devices/Client/DeviceClientEmdWrapper.h"
+#include "Invn/Devices/Client/DeviceClientEmdWrapIcm20xxx.h"
 #include "Invn/Devices/Client/DeviceClientEmdWrapIcm30xxx.h"
 #include "Invn/Devices/Client/DeviceClientGsh.h"
 #include "Invn/Devices/Client/DeviceClientChre.h"
@@ -146,11 +146,11 @@ OSVR_ReturnCode InvenSenseController::setupDevice() {
         }
     }
 
-    _selected_target = TARGET_EMDWRAPPER;
+    _selected_target = TARGET_EMDWRAP_ICM20XXX;
     switch (_selected_target) {
-    case TARGET_EMDWRAPPER:
-        device.reset(new DeviceClientEmdWrapper(mPort));
-        break;
+	case TARGET_EMDWRAP_ICM20XXX:
+		device.reset(new DeviceClientEmdWrapIcm20xxx(mPort));
+		break;
     default:
         assert(0);
         return OSVR_RETURN_FAILURE;

@@ -105,16 +105,6 @@ set_target_properties(IDDIcm20603 PROPERTIES
 list(APPEND _IMPORT_CHECK_TARGETS IDDIcm20603 )
 list(APPEND _IMPORT_CHECK_FILES_FOR_IDDIcm20603 "${_IMPORT_PREFIX}/release/lib/IDDIcm20603.lib" )
 
-# Import target "IDDWrapper" for configuration "RelWithDebInfo"
-set_property(TARGET IDDWrapper APPEND PROPERTY IMPORTED_CONFIGURATIONS RELWITHDEBINFO)
-set_target_properties(IDDWrapper PROPERTIES
-  IMPORTED_LINK_INTERFACE_LANGUAGES_RELWITHDEBINFO "C"
-  IMPORTED_LOCATION_RELWITHDEBINFO "${_IMPORT_PREFIX}/release/lib/IDDWrapper.lib"
-  )
-
-list(APPEND _IMPORT_CHECK_TARGETS IDDWrapper )
-list(APPEND _IMPORT_CHECK_FILES_FOR_IDDWrapper "${_IMPORT_PREFIX}/release/lib/IDDWrapper.lib" )
-
 # Import target "IDDAk0991x" for configuration "RelWithDebInfo"
 set_property(TARGET IDDAk0991x APPEND PROPERTY IMPORTED_CONFIGURATIONS RELWITHDEBINFO)
 set_target_properties(IDDAk0991x PROPERTIES
@@ -145,15 +135,15 @@ set_target_properties(IDD PROPERTIES
 list(APPEND _IMPORT_CHECK_TARGETS IDD )
 list(APPEND _IMPORT_CHECK_FILES_FOR_IDD "${_IMPORT_PREFIX}/release/lib/IDD.lib" )
 
-# Import target "IDDDeviceEmdWrapper" for configuration "RelWithDebInfo"
-set_property(TARGET IDDDeviceEmdWrapper APPEND PROPERTY IMPORTED_CONFIGURATIONS RELWITHDEBINFO)
-set_target_properties(IDDDeviceEmdWrapper PROPERTIES
+# Import target "IDDDeviceEmdWrapIcm20xxx" for configuration "RelWithDebInfo"
+set_property(TARGET IDDDeviceEmdWrapIcm20xxx APPEND PROPERTY IMPORTED_CONFIGURATIONS RELWITHDEBINFO)
+set_target_properties(IDDDeviceEmdWrapIcm20xxx PROPERTIES
   IMPORTED_LINK_INTERFACE_LANGUAGES_RELWITHDEBINFO "C"
-  IMPORTED_LOCATION_RELWITHDEBINFO "${_IMPORT_PREFIX}/release/lib/IDDDeviceEmdWrapper.lib"
+  IMPORTED_LOCATION_RELWITHDEBINFO "${_IMPORT_PREFIX}/release/lib/IDDDeviceEmdWrapIcm20xxx.lib"
   )
 
-list(APPEND _IMPORT_CHECK_TARGETS IDDDeviceEmdWrapper )
-list(APPEND _IMPORT_CHECK_FILES_FOR_IDDDeviceEmdWrapper "${_IMPORT_PREFIX}/release/lib/IDDDeviceEmdWrapper.lib" )
+list(APPEND _IMPORT_CHECK_TARGETS IDDDeviceEmdWrapIcm20xxx )
+list(APPEND _IMPORT_CHECK_FILES_FOR_IDDDeviceEmdWrapIcm20xxx "${_IMPORT_PREFIX}/release/lib/IDDDeviceEmdWrapIcm20xxx.lib" )
 
 # Import target "IDDDeviceEmdWrapIcm30xxx" for configuration "RelWithDebInfo"
 set_property(TARGET IDDDeviceEmdWrapIcm30xxx APPEND PROPERTY IMPORTED_CONFIGURATIONS RELWITHDEBINFO)

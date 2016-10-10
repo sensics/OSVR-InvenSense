@@ -16,7 +16,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_targetsDefined)
 set(_targetsNotDefined)
 set(_expectedTargets)
-foreach(_expectedTarget VSensorFwk EmbUtils DynamicProtocol IDDHostUtils IDDFifoProtocol IDDHostAdapter IDDIcm30xxx IDDIcm20602 IDDIcm20690 IDDIcm20603 IDDWrapper IDDAk0991x IDDIcm20648 IDD IDDDeviceEmdWrapper IDDDeviceEmdWrapIcm30xxx IDDDeviceGsh IDDDeviceAk0991x IDDDeviceOther IDDDeviceIcm30xxx IDDDeviceIcm20602 IDDDeviceIcm20690 IDDDeviceIcm20603 IDDDeviceIcm20648 IDDDeviceSmartMotion IDDClient MLMath VSensorImplCModel VSensorImplEISGyr AlgoInvn IDDShared)
+foreach(_expectedTarget VSensorFwk EmbUtils DynamicProtocol IDDHostUtils IDDFifoProtocol IDDHostAdapter IDDIcm30xxx IDDIcm20602 IDDIcm20690 IDDIcm20603 IDDWrapper IDDAk0991x IDDIcm20648 IDD IDDDeviceEmdWrapIcm20xxx IDDDeviceEmdWrapIcm30xxx IDDDeviceGsh IDDDeviceAk0991x IDDDeviceOther IDDDeviceIcm30xxx IDDDeviceIcm20602 IDDDeviceIcm20690 IDDDeviceIcm20603 IDDDeviceIcm20648 IDDDeviceSmartMotion IDDClient MLMath VSensorImplCModel VSensorImplEISGyr AlgoInvn IDDShared)
   list(APPEND _expectedTargets ${_expectedTarget})
   if(NOT TARGET ${_expectedTarget})
     list(APPEND _targetsNotDefined ${_expectedTarget})
@@ -120,12 +120,9 @@ set_target_properties(IDDIcm20648 PROPERTIES
 # Create imported target IDD
 add_library(IDD STATIC IMPORTED)
 
-# Create imported target IDDDeviceEmdWrapper
-add_library(IDDDeviceEmdWrapper STATIC IMPORTED)
+# Create imported target IDDDeviceEmdWrapIcm20xxx
+add_library(IDDDeviceEmdWrapIcm20xxx STATIC IMPORTED)
 
-set_target_properties(IDDDeviceEmdWrapper PROPERTIES
-  INTERFACE_LINK_LIBRARIES "IDDWrapper"
-)
 
 # Create imported target IDDDeviceEmdWrapIcm30xxx
 add_library(IDDDeviceEmdWrapIcm30xxx STATIC IMPORTED)
@@ -201,7 +198,7 @@ set_target_properties(IDDDeviceSmartMotion PROPERTIES
 add_library(IDDClient STATIC IMPORTED)
 
 set_target_properties(IDDClient PROPERTIES
-  INTERFACE_LINK_LIBRARIES "IDDDeviceIcm20602;IDDDeviceIcm20690;IDDDeviceIcm20603;IDDDeviceSmartMotion;IDDDeviceIcm30xxx;IDDDeviceOther;IDDDeviceEmdWrapper;IDDDeviceEmdWrapIcm30xxx;IDDDeviceGsh;IDDDeviceIcm20648;PocoNet_s;PocoUtil_s;PocoXML_s;PocoFoundation_s"
+  INTERFACE_LINK_LIBRARIES "IDDDeviceIcm20602;IDDDeviceIcm20690;IDDDeviceIcm20603;IDDDeviceSmartMotion;IDDDeviceIcm30xxx;IDDDeviceOther;IDDDeviceEmdWrapIcm20xxx;IDDDeviceEmdWrapIcm30xxx;IDDDeviceGsh;IDDDeviceIcm20648;PocoNet_s;PocoUtil_s;PocoXML_s;PocoFoundation_s"
 )
 
 # Create imported target MLMath

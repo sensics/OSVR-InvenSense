@@ -66,9 +66,8 @@ target_link_libraries(com_sensics_InvenSense
     IDDDeviceIcm30xxx
     IDDIcm30xxx
     IDDFifoProtocol
-    IDDDeviceEmdWrapper
+    IDDDeviceEmdWrapIcm20xxx
     IDDDeviceGsh
-    IDDWrapper
     IDDHostUtils
     IDDIcm20648
     AlgoInvn
