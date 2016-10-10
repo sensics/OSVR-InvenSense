@@ -33,6 +33,7 @@
 #include <math.h>
 #include <json/reader.h>
 #include <json/value.h>
+#include <quat/quat.h>
 
 // Standard includes
 #include <deque>
@@ -49,6 +50,8 @@ typedef std::shared_ptr<InvenSenseController> InvnCtlPtr;
 
 inline const std::string getTargetDefault() { return "emdwrapper"; }
 inline const std::string getAdapterDefault() { return "dummy"; }
+
+static const double invensense_DT = 1.0 / 50;
 
 class InvenSenseDevice : public SensorEventsListener {
   public:
@@ -90,6 +93,41 @@ class InvenSenseDevice : public SensorEventsListener {
         osvrTimeValueGetNow(&timestamp);
         osvrDeviceTrackerSendOrientationTimestamped(
             m_dev, m_tracker, &orientation, 0, &timestamp);
+
+        q_type forward, inverse;
+        q_copy(forward, inverse);
+        q_invert(inverse, forward);
+        q_type delta;
+        {
+            delta[Q_W] = 0;
+            delta[Q_X] = event.data.gyr.vect[0] * invensense_DT * 0.5;
+            delta[Q_Y] = event.data.gyr.vect[1] * invensense_DT * 0.5;
+            delta[Q_Z] = event.data.gyr.vect[2] * invensense_DT * 0.5;
+            q_exp(delta, delta);
+            q_normalize(delta, delta);
+        }
+
+        q_type canonical;
+        q_mult(canonical, delta, inverse);
+        double vel_quat[4];
+        double vel_quat_dt = invensense_DT;
+        vel_quat[0] = vel_quat[1] = vel_quat[2] = 0.0;
+        vel_quat[3] = 1.0;
+        q_mult(vel_quat, forward, canonical);
+
+        OSVR_VelocityState vel;
+        vel.angularVelocity.dt = vel_quat_dt;
+        vel.angularVelocity.incrementalRotation.data[Q_W] = vel_quat[Q_W];
+        vel.angularVelocity.incrementalRotation.data[Q_X] = vel_quat[Q_X];
+        vel.angularVelocity.incrementalRotation.data[Q_Y] = vel_quat[Q_Y];
+        vel.angularVelocity.incrementalRotation.data[Q_Z] = vel_quat[Q_Z];
+
+        vel.linearVelocity.data[0] = event.data.gyr.vect[0];
+        vel.linearVelocity.data[1] = event.data.gyr.vect[1];
+        vel.linearVelocity.data[2] = event.data.gyr.vect[2];
+
+        osvrDeviceTrackerSendVelocityTimestamped(m_dev, m_tracker, &vel, 0,
+                                                 &timestamp);
     }
 
   private:
