@@ -202,6 +202,14 @@ OSVR_ReturnCode InvenSenseController::enableSensor(int sensorID) {
     return OSVR_RETURN_SUCCESS;
 }
 
+OSVR_ReturnCode InvenSenseController::enableSensor(int sensorID, unsigned long period_us) {
+
+	device->setSensorPeriodUs(sensorID, period_us);
+    device->startSensor(sensorID);
+
+    return OSVR_RETURN_SUCCESS;
+}
+
 void InvenSenseController::waitForDebugger(DeviceClient *device) {
     std::cout << "waitForDebugger" << std::endl;
 }

@@ -76,8 +76,8 @@ class InvenSenseDevice : public SensorEventsListener {
         /// Register update callback
         m_dev.registerUpdateCallback(this);
         _dispatcher.subscribe(this);
-
-        controller->enableSensor(INV_SENSOR_TYPE_GAME_ROTATION_VECTOR);
+		//Enable Game Rotation vector at 1KHz.
+        controller->enableSensor(INV_SENSOR_TYPE_GAME_ROTATION_VECTOR, 1000);
     }
 
     OSVR_ReturnCode InvenSenseDevice::update() { return OSVR_RETURN_SUCCESS; }
