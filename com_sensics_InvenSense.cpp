@@ -68,7 +68,7 @@ class InvenSenseDevice : public SensorEventsListener {
         osvrDeviceTrackerConfigure(opts, &m_tracker);
 
         /// Create the sync device token with the options
-        m_dev.initSync(ctx, "InvenSense", opts);
+        m_dev.initAsync(ctx, "InvenSense", opts);
 
         /// Send JSON descriptor
         m_dev.sendJsonDescriptor(com_sensics_InvenSense_json);
@@ -100,9 +100,9 @@ class InvenSenseDevice : public SensorEventsListener {
         q_type delta;
         {
             delta[Q_W] = 0;
-            delta[Q_X] = event.data.gyr.vect[0] * invensense_DT * 0.5;
-            delta[Q_Y] = event.data.gyr.vect[1] * invensense_DT * 0.5;
-            delta[Q_Z] = event.data.gyr.vect[2] * invensense_DT * 0.5;
+            delta[Q_X] = event.data.gyr.vect[0] * invensense_DT * 0.5 * 0.0174533;
+            delta[Q_Y] = event.data.gyr.vect[1] * invensense_DT * 0.5 * 0.0174533;
+            delta[Q_Z] = event.data.gyr.vect[2] * invensense_DT * 0.5 * 0.0174533;
             q_exp(delta, delta);
             q_normalize(delta, delta);
         }
