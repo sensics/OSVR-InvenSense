@@ -76,7 +76,7 @@ class InvenSenseDevice : public SensorEventsListener {
         /// Register update callback
         m_dev.registerUpdateCallback(this);
         _dispatcher.subscribe(this);
-		//Enable Game Rotation vector at 1KHz.
+        // Enable Game Rotation vector at 1KHz.
         controller->enableSensor(INV_SENSOR_TYPE_GAME_ROTATION_VECTOR, 1000);
     }
 
@@ -100,9 +100,12 @@ class InvenSenseDevice : public SensorEventsListener {
         q_type delta;
         {
             delta[Q_W] = 0;
-            delta[Q_X] = event.data.gyr.vect[0] * invensense_DT * 0.5 * 0.0174533;
-            delta[Q_Y] = event.data.gyr.vect[1] * invensense_DT * 0.5 * 0.0174533;
-            delta[Q_Z] = event.data.gyr.vect[2] * invensense_DT * 0.5 * 0.0174533;
+            delta[Q_X] =
+                event.data.gyr.vect[0] * invensense_DT * 0.5 * 0.0174533;
+            delta[Q_Y] =
+                event.data.gyr.vect[1] * invensense_DT * 0.5 * 0.0174533;
+            delta[Q_Z] =
+                event.data.gyr.vect[2] * invensense_DT * 0.5 * 0.0174533;
             q_exp(delta, delta);
             q_normalize(delta, delta);
         }

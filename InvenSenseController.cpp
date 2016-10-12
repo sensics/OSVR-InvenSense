@@ -148,9 +148,9 @@ OSVR_ReturnCode InvenSenseController::setupDevice() {
 
     _selected_target = TARGET_EMDWRAP_ICM20XXX;
     switch (_selected_target) {
-	case TARGET_EMDWRAP_ICM20XXX:
-		device.reset(new DeviceClientEmdWrapIcm20xxx(mPort));
-		break;
+    case TARGET_EMDWRAP_ICM20XXX:
+        device.reset(new DeviceClientEmdWrapIcm20xxx(mPort));
+        break;
     default:
         assert(0);
         return OSVR_RETURN_FAILURE;
@@ -202,9 +202,10 @@ OSVR_ReturnCode InvenSenseController::enableSensor(int sensorID) {
     return OSVR_RETURN_SUCCESS;
 }
 
-OSVR_ReturnCode InvenSenseController::enableSensor(int sensorID, unsigned long period_us) {
+OSVR_ReturnCode InvenSenseController::enableSensor(int sensorID,
+                                                   unsigned long period_us) {
 
-	device->setSensorPeriodUs(sensorID, period_us);
+    device->setSensorPeriodUs(sensorID, period_us);
     device->startSensor(sensorID);
 
     return OSVR_RETURN_SUCCESS;
