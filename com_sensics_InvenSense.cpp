@@ -77,75 +77,83 @@ class InvenSenseDevice : public SensorEventsListener {
         m_dev.registerUpdateCallback(this);
         _dispatcher.subscribe(this);
         // Enable Gyroscope vector at 1KHz.
-		controller->enableSensor(INV_SENSOR_TYPE_GYROSCOPE, 1000);
+        controller->enableSensor(INV_SENSOR_TYPE_GYROSCOPE, 1000);
     }
 
     OSVR_ReturnCode InvenSenseDevice::update() { return OSVR_RETURN_SUCCESS; }
 
     void InvenSenseDevice::notify(const inv_sensor_event_t &event) {
-		int sensorId = (int)(event.sensor & ~INV_SENSOR_TYPE_WU_FLAG);
+        int sensorId = (int)(event.sensor & ~INV_SENSOR_TYPE_WU_FLAG);
         OSVR_OrientationState orientation;
         OSVR_TimeValue timestamp;
-        q_type forward, inverse;
-        q_type delta;
-        q_type canonical;
-        double vel_quat[4];
-        double vel_quat_dt = 0;
-        OSVR_VelocityState vel;
-		switch(sensorId){
-			case INV_SENSOR_TYPE_GAME_ROTATION_VECTOR: 
-				orientation.data[0] = event.data.quaternion.quat[0];
-				orientation.data[1] = event.data.quaternion.quat[1];
-				orientation.data[2] = event.data.quaternion.quat[2];
-				orientation.data[3] = event.data.quaternion.quat[3];
-				osvrTimeValueGetNow(&timestamp);
-				osvrDeviceTrackerSendOrientationTimestamped(
-					m_dev, m_tracker, &orientation, 0, &timestamp);
-				break;
+        switch (sensorId) {
+        case INV_SENSOR_TYPE_GAME_ROTATION_VECTOR:
+            orientation.data[0] = event.data.quaternion.quat[0];
+            orientation.data[1] = event.data.quaternion.quat[1];
+            orientation.data[2] = event.data.quaternion.quat[2];
+            orientation.data[3] = event.data.quaternion.quat[3];
+            osvrTimeValueGetNow(&timestamp);
+            osvrDeviceTrackerSendOrientationTimestamped(
+                m_dev, m_tracker, &orientation, 0, &timestamp);
+            break;
 
-			case INV_SENSOR_TYPE_GYROSCOPE:
-		        q_copy(forward, inverse);
-		        q_invert(inverse, forward);
-				delta[Q_W] = 0;
-				delta[Q_X] =
-					event.data.gyr.vect[0] * invensense_DT * 0.5 * 0.0174533;
-				delta[Q_Y] =
-					event.data.gyr.vect[1] * invensense_DT * 0.5 * 0.0174533;
-				delta[Q_Z] =
-					event.data.gyr.vect[2] * invensense_DT * 0.5 * 0.0174533;
-				//Wait for the calibration of gyro before starting game rotation vector.
-				if(!m_gyro_cal && event.data.gyr.accuracy_flag == 3){ 
-					m_gyro_cal = true;
-					// Enable Game Rotation vector at 1KHz.
-					m_controller->enableSensor(INV_SENSOR_TYPE_GAME_ROTATION_VECTOR, 1000);
-				}
-				//If gyro calibration is done use prediction
-				if(m_gyro_cal){
-					q_exp(delta, delta);
-					q_normalize(delta, delta);
-					q_mult(canonical, delta, inverse);
-					vel_quat_dt = invensense_DT;
-					vel_quat[0] = vel_quat[1] = vel_quat[2] = 0.0;
-					vel_quat[3] = 1.0;
-					q_mult(vel_quat, forward, canonical);
-					vel.angularVelocity.dt = vel_quat_dt;
-					vel.angularVelocity.incrementalRotation.data[Q_W] = vel_quat[Q_W];
-					vel.angularVelocity.incrementalRotation.data[Q_X] = vel_quat[Q_X];
-					vel.angularVelocity.incrementalRotation.data[Q_Y] = vel_quat[Q_Y];
-					vel.angularVelocity.incrementalRotation.data[Q_Z] = vel_quat[Q_Z];
+        case INV_SENSOR_TYPE_GYROSCOPE:
 
-					vel.linearVelocity.data[0] = event.data.gyr.vect[0];
-					vel.linearVelocity.data[1] = event.data.gyr.vect[1];
-					vel.linearVelocity.data[2] = event.data.gyr.vect[2];
+            // Wait for the calibration of gyro before starting game rotation
+            // vector.
+            if (!m_gyro_cal && event.data.gyr.accuracy_flag == 3) {
+                m_gyro_cal = true;
+                // Enable Game Rotation vector at 1KHz.
+                m_controller->enableSensor(INV_SENSOR_TYPE_GAME_ROTATION_VECTOR,
+                                           1000);
+            }
+            // If gyro calibration is done use prediction
+            if (m_gyro_cal) {
+                q_type forward, inverse;
+                q_type delta;
+                q_type canonical;
+                double vel_quat[4];
+                double vel_quat_dt = 0.0;
+                OSVR_VelocityState vel;
+                q_copy(forward, inverse);
+                q_invert(inverse, forward);
+                delta[Q_W] = 0;
+                delta[Q_X] =
+                    event.data.gyr.vect[0] * invensense_DT * 0.5 * 0.0174533;
+                delta[Q_Y] =
+                    event.data.gyr.vect[1] * invensense_DT * 0.5 * 0.0174533;
+                delta[Q_Z] =
+                    event.data.gyr.vect[2] * invensense_DT * 0.5 * 0.0174533;
 
-					osvrDeviceTrackerSendVelocityTimestamped(m_dev, m_tracker, &vel, 0,
-													 &timestamp);
-				}
-				break;
+                q_exp(delta, delta);
+                q_normalize(delta, delta);
+                q_mult(canonical, delta, inverse);
+                vel_quat_dt = invensense_DT;
+                vel_quat[0] = vel_quat[1] = vel_quat[2] = 0.0;
+                vel_quat[3] = 1.0;
+                q_mult(vel_quat, forward, canonical);
+                vel.angularVelocity.dt = vel_quat_dt;
+                vel.angularVelocity.incrementalRotation.data[Q_W] =
+                    vel_quat[Q_W];
+                vel.angularVelocity.incrementalRotation.data[Q_X] =
+                    vel_quat[Q_X];
+                vel.angularVelocity.incrementalRotation.data[Q_Y] =
+                    vel_quat[Q_Y];
+                vel.angularVelocity.incrementalRotation.data[Q_Z] =
+                    vel_quat[Q_Z];
 
-			default:
-				break;
-		}
+                vel.linearVelocity.data[0] = event.data.gyr.vect[0];
+                vel.linearVelocity.data[1] = event.data.gyr.vect[1];
+                vel.linearVelocity.data[2] = event.data.gyr.vect[2];
+                osvrTimeValueGetNow(&timestamp);
+                osvrDeviceTrackerSendVelocityTimestamped(m_dev, m_tracker, &vel,
+                                                         0, &timestamp);
+            }
+            break;
+
+        default:
+            break;
+        }
     }
 
   private:
@@ -154,7 +162,7 @@ class InvenSenseDevice : public SensorEventsListener {
     InvnCtlPtr m_controller;
     OSVR_TimeValue m_last;
     SensorEventsDispatcher &_dispatcher;
-	bool m_gyro_cal;
+    bool m_gyro_cal;
 };
 
 class InvenSensePluginInstantiation {
