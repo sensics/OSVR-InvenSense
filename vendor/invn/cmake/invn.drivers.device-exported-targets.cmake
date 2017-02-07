@@ -16,7 +16,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_targetsDefined)
 set(_targetsNotDefined)
 set(_expectedTargets)
-foreach(_expectedTarget VSensorFwk EmbUtils DynamicProtocol IDDHostUtils IDDFifoProtocol IDDHostAdapter IDDIcm30xxx IDDIcm20602 IDDIcm20690 IDDIcm20603 IDDWrapper IDDAk0991x IDDIcm20648 IDD IDDDeviceEmdWrapIcm20xxx IDDDeviceEmdWrapIcm30xxx IDDDeviceGsh IDDDeviceAk0991x IDDDeviceOther IDDDeviceIcm30xxx IDDDeviceIcm20602 IDDDeviceIcm20690 IDDDeviceIcm20603 IDDDeviceIcm20648 IDDDeviceSmartMotion IDDClient MLMath VSensorImplCModel VSensorImplEISGyr AlgoInvn IDDShared)
+foreach(_expectedTarget EmbUtils DynamicProtocol IDDHostUtils IDDHostAdapter IDD IDDDeviceEmdWrapIcm20xxx IDDClient)
   list(APPEND _expectedTargets ${_expectedTarget})
   if(NOT TARGET ${_expectedTarget})
     list(APPEND _targetsNotDefined ${_expectedTarget})
@@ -42,9 +42,6 @@ unset(_expectedTargets)
 get_filename_component(_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
 get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
 
-# Create imported target VSensorFwk
-add_library(VSensorFwk STATIC IMPORTED)
-
 # Create imported target EmbUtils
 add_library(EmbUtils STATIC IMPORTED)
 
@@ -58,63 +55,11 @@ set_target_properties(IDDHostUtils PROPERTIES
   INTERFACE_LINK_LIBRARIES "PocoNet_s;PocoUtil_s;PocoXML_s;PocoFoundation_s;EmbUtils"
 )
 
-# Create imported target IDDFifoProtocol
-add_library(IDDFifoProtocol STATIC IMPORTED)
-
 # Create imported target IDDHostAdapter
 add_library(IDDHostAdapter STATIC IMPORTED)
 
 set_target_properties(IDDHostAdapter PROPERTIES
   INTERFACE_LINK_LIBRARIES "PocoNet_s;PocoUtil_s;PocoXML_s;PocoFoundation_s;IDD;IDDHostUtils"
-)
-
-# Create imported target IDDIcm30xxx
-add_library(IDDIcm30xxx STATIC IMPORTED)
-
-set_target_properties(IDDIcm30xxx PROPERTIES
-  INTERFACE_LINK_LIBRARIES "EmbUtils;IDDFifoProtocol"
-)
-
-# Create imported target IDDIcm20602
-add_library(IDDIcm20602 STATIC IMPORTED)
-
-set_target_properties(IDDIcm20602 PROPERTIES
-  INTERFACE_LINK_LIBRARIES "EmbUtils"
-)
-
-# Create imported target IDDIcm20690
-add_library(IDDIcm20690 STATIC IMPORTED)
-
-set_target_properties(IDDIcm20690 PROPERTIES
-  INTERFACE_LINK_LIBRARIES "EmbUtils"
-)
-
-# Create imported target IDDIcm20603
-add_library(IDDIcm20603 STATIC IMPORTED)
-
-set_target_properties(IDDIcm20603 PROPERTIES
-  INTERFACE_LINK_LIBRARIES "EmbUtils"
-)
-
-# Create imported target IDDWrapper
-add_library(IDDWrapper STATIC IMPORTED)
-
-set_target_properties(IDDWrapper PROPERTIES
-  INTERFACE_LINK_LIBRARIES "EmbUtils"
-)
-
-# Create imported target IDDAk0991x
-add_library(IDDAk0991x STATIC IMPORTED)
-
-set_target_properties(IDDAk0991x PROPERTIES
-  INTERFACE_LINK_LIBRARIES "EmbUtils"
-)
-
-# Create imported target IDDIcm20648
-add_library(IDDIcm20648 STATIC IMPORTED)
-
-set_target_properties(IDDIcm20648 PROPERTIES
-  INTERFACE_LINK_LIBRARIES "EmbUtils"
 )
 
 # Create imported target IDD
@@ -124,109 +69,13 @@ add_library(IDD STATIC IMPORTED)
 add_library(IDDDeviceEmdWrapIcm20xxx STATIC IMPORTED)
 
 
-# Create imported target IDDDeviceEmdWrapIcm30xxx
-add_library(IDDDeviceEmdWrapIcm30xxx STATIC IMPORTED)
-
-set_target_properties(IDDDeviceEmdWrapIcm30xxx PROPERTIES
-  INTERFACE_LINK_LIBRARIES "DynamicProtocol"
-)
-
-# Create imported target IDDDeviceGsh
-add_library(IDDDeviceGsh STATIC IMPORTED)
-
-set_target_properties(IDDDeviceGsh PROPERTIES
-  INTERFACE_LINK_LIBRARIES "DynamicProtocol"
-)
-
-# Create imported target IDDDeviceAk0991x
-add_library(IDDDeviceAk0991x STATIC IMPORTED)
-
-set_target_properties(IDDDeviceAk0991x PROPERTIES
-  INTERFACE_LINK_LIBRARIES "IDDAk0991x"
-)
-
-# Create imported target IDDDeviceOther
-add_library(IDDDeviceOther STATIC IMPORTED)
-
-set_target_properties(IDDDeviceOther PROPERTIES
-  INTERFACE_LINK_LIBRARIES "IDDDeviceIcm30xxx;IDD;InvChreDriver"
-)
-
-# Create imported target IDDDeviceIcm30xxx
-add_library(IDDDeviceIcm30xxx STATIC IMPORTED)
-
-set_target_properties(IDDDeviceIcm30xxx PROPERTIES
-  INTERFACE_LINK_LIBRARIES "IDDIcm30xxx;IDDFifoProtocol;IDD"
-)
-
-# Create imported target IDDDeviceIcm20602
-add_library(IDDDeviceIcm20602 STATIC IMPORTED)
-
-set_target_properties(IDDDeviceIcm20602 PROPERTIES
-  INTERFACE_LINK_LIBRARIES "IDDIcm20602;IDD"
-)
-
-# Create imported target IDDDeviceIcm20690
-add_library(IDDDeviceIcm20690 STATIC IMPORTED)
-
-set_target_properties(IDDDeviceIcm20690 PROPERTIES
-  INTERFACE_LINK_LIBRARIES "IDDIcm20690;IDD"
-)
-
-# Create imported target IDDDeviceIcm20603
-add_library(IDDDeviceIcm20603 STATIC IMPORTED)
-
-set_target_properties(IDDDeviceIcm20603 PROPERTIES
-  INTERFACE_LINK_LIBRARIES "IDDIcm20603;IDD"
-)
-
-# Create imported target IDDDeviceIcm20648
-add_library(IDDDeviceIcm20648 STATIC IMPORTED)
-
-set_target_properties(IDDDeviceIcm20648 PROPERTIES
-  INTERFACE_LINK_LIBRARIES "IDDIcm20648;IDD"
-)
-
-# Create imported target IDDDeviceSmartMotion
-add_library(IDDDeviceSmartMotion STATIC IMPORTED)
-
-set_target_properties(IDDDeviceSmartMotion PROPERTIES
-  INTERFACE_LINK_LIBRARIES "VSensorFwk;EmbUtils;IDD;VSensorImplCModel;VSensorImplEISGyr"
-)
-
 # Create imported target IDDClient
 add_library(IDDClient STATIC IMPORTED)
 
 set_target_properties(IDDClient PROPERTIES
-  INTERFACE_LINK_LIBRARIES "IDDDeviceIcm20602;IDDDeviceIcm20690;IDDDeviceIcm20603;IDDDeviceSmartMotion;IDDDeviceIcm30xxx;IDDDeviceOther;IDDDeviceEmdWrapIcm20xxx;IDDDeviceEmdWrapIcm30xxx;IDDDeviceGsh;IDDDeviceIcm20648;PocoNet_s;PocoUtil_s;PocoXML_s;PocoFoundation_s"
+  INTERFACE_LINK_LIBRARIES "IDDDeviceEmdWrapIcm20xxx;PocoNet_s;PocoUtil_s;PocoXML_s;PocoFoundation_s"
 )
 
-# Create imported target MLMath
-add_library(MLMath STATIC IMPORTED)
-
-# Create imported target VSensorImplCModel
-add_library(VSensorImplCModel STATIC IMPORTED)
-
-set_target_properties(VSensorImplCModel PROPERTIES
-  INTERFACE_LINK_LIBRARIES "MLMath;AlgoInvn"
-)
-
-# Create imported target VSensorImplEISGyr
-add_library(VSensorImplEISGyr STATIC IMPORTED)
-
-# Create imported target AlgoInvn
-add_library(AlgoInvn STATIC IMPORTED)
-
-set_target_properties(AlgoInvn PROPERTIES
-  INTERFACE_LINK_LIBRARIES "MLMath;libCalibrationFxp;libOrientationFxp;libAAR;libGestureFxp"
-)
-
-# Create imported target IDDShared
-add_library(IDDShared SHARED IMPORTED)
-
-set_target_properties(IDDShared PROPERTIES
-  INTERFACE_LINK_LIBRARIES "DynamicProtocol;EmbUtils;VSensorFwk;VSensorImplCModel;VSensorImplEISGyr;IDDFifoProtocol;IDDDeviceOther;PocoNet_s;PocoUtil_s;PocoXML_s;PocoFoundation_s"
-)
 
 if(CMAKE_VERSION VERSION_LESS 2.8.12)
   message(FATAL_ERROR "This file relies on consumers using CMake 2.8.12 or greater.")

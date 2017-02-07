@@ -12,7 +12,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_targetsDefined)
 set(_targetsNotDefined)
 set(_expectedTargets)
-foreach(_expectedTarget InvChreDriver libAAR libCalibrationFxp libGestureFxp libOrientationFxp PocoFoundation_s PocoJSON_s PocoNet_s PocoUtil_s PocoXML_s)
+foreach(_expectedTarget PocoFoundation_s PocoJSON_s PocoNet_s PocoUtil_s PocoXML_s)
   list(APPEND _expectedTargets ${_expectedTarget})
   if(NOT TARGET ${_expectedTarget})
     list(APPEND _targetsNotDefined ${_expectedTarget})
@@ -37,21 +37,6 @@ unset(_expectedTargets)
 # Compute the installation prefix relative to this file.
 get_filename_component(_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
 get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
-
-# Create imported target InvChreDriver
-add_library(InvChreDriver STATIC IMPORTED)
-
-# Create imported target libAAR
-add_library(libAAR STATIC IMPORTED)
-
-# Create imported target libCalibrationFxp
-add_library(libCalibrationFxp STATIC IMPORTED)
-
-# Create imported target libGestureFxp
-add_library(libGestureFxp STATIC IMPORTED)
-
-# Create imported target libOrientationFxp
-add_library(libOrientationFxp STATIC IMPORTED)
 
 # Create imported target PocoFoundation_s
 add_library(PocoFoundation_s STATIC IMPORTED)

@@ -24,20 +24,7 @@
 
 // Internal Includes
 #include "InvenSenseController.h"
-
-#include "Invn/Devices/Client/DeviceClientIcm30xxx.h"
-#include "Invn/Devices/Client/DeviceClientVanadiumEMD.h"
-#include "Invn/Devices/Client/DeviceClientIcm20648.h"
-#include "Invn/Devices/Client/DeviceClientDummy.h"
-#include "Invn/Devices/Client/DeviceClientSmartMotion.h"
-#include "Invn/Devices/Client/DeviceClientIcm20602.h"
-#include "Invn/Devices/Client/DeviceClientIcm20603.h"
-#include "Invn/Devices/Client/DeviceClientIcm20690.h"
 #include "Invn/Devices/Client/DeviceClientEmdWrapIcm20xxx.h"
-#include "Invn/Devices/Client/DeviceClientEmdWrapIcm30xxx.h"
-#include "Invn/Devices/Client/DeviceClientGsh.h"
-#include "Invn/Devices/Client/DeviceClientChre.h"
-#include "Invn/Devices/HostAdapter/CheetahAdapter.h"
 
 #include <cassert>
 #include <cstdio>
@@ -56,7 +43,7 @@ InvenSenseController::InvenSenseController(const std::string &target,
                                            const std::string &port,
                                            const std::string &adapter)
     : _serif_instance(0), _serif_instance_ois(0), _serif_instance_i2cslave(0),
-      deviceLogger(""), event_poller(0), watchdog_poller(0),
+      event_poller(0), watchdog_poller(0),
       deviceConnected(false), mTarget(target), mPort(port), mAdapter(adapter) {
 
     OSVR_ReturnCode ret = setupDevice();

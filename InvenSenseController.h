@@ -33,13 +33,10 @@
 #include <osvr/PluginKit/TrackerInterfaceC.h>
 
 #include "DeviceInstance.h"
-#include "SensorEventsPrinter.h"
-#include "DefaultOutputStream.h"
 #include "Invn/Devices/Client/AsyncSensorEventsListener.h"
 #include "Invn/Devices/Client/HostAdapterClient.h"
 #include "Invn/Devices/Client/DataEventPoller.h"
 #include "Invn/Devices/Client/WatchdogPoller.h"
-#include "Invn/Devices/Client/FileDeviceLogger.h"
 #include "Invn/Devices/Client/SensorEventsDispatcher.h"
 
 #include <memory>
@@ -122,13 +119,6 @@ class InvenSenseController : public DeviceDebuggerHook,
 
     /* create device */
     std::auto_ptr<DeviceClient> device;
-
-    /* device logger */
-    FileDeviceLogger deviceLogger;
-
-    /* create singletons for other objects */
-    SensorEventsPrinter sensorEventPrinter;
-    DefaultOutputStream defaultStream;
 
     /* Asynchronous listener of data event */
     AsyncSensorEventsListener async_listener;

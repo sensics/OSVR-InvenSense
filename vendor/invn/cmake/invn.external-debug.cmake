@@ -1,56 +1,6 @@
 # Commands may need to know the format version.
 set(CMAKE_IMPORT_FILE_VERSION 1)
 
-# Import target "InvChreDriver" for configuration "Debug"
-set_property(TARGET InvChreDriver APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
-set_target_properties(InvChreDriver PROPERTIES
-  IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "C"
-  IMPORTED_LOCATION_DEBUG "${_IMPORT_PREFIX}/external/lib/debug/InvChreDriver.lib"
-  )
-
-list(APPEND _IMPORT_CHECK_TARGETS InvChreDriver )
-list(APPEND _IMPORT_CHECK_FILES_FOR_InvChreDriver "${_IMPORT_PREFIX}/external/lib/debug/InvChreDriver.lib" )
-
-# Import target "libAAR" for configuration "Debug"
-set_property(TARGET libAAR APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
-set_target_properties(libAAR PROPERTIES
-  IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "C"
-  IMPORTED_LOCATION_DEBUG "${_IMPORT_PREFIX}/external/lib/debug/libAAR.lib"
-  )
-
-list(APPEND _IMPORT_CHECK_TARGETS libAAR )
-list(APPEND _IMPORT_CHECK_FILES_FOR_libAAR "${_IMPORT_PREFIX}/external/lib/debug/libAAR.lib" )
-
-# Import target "libCalibrationFxp" for configuration "Debug"
-set_property(TARGET libCalibrationFxp APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
-set_target_properties(libCalibrationFxp PROPERTIES
-  IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "C"
-  IMPORTED_LOCATION_DEBUG "${_IMPORT_PREFIX}/external/lib/debug/libCalibrationFxp.lib"
-  )
-
-list(APPEND _IMPORT_CHECK_TARGETS libCalibrationFxp )
-list(APPEND _IMPORT_CHECK_FILES_FOR_libCalibrationFxp "${_IMPORT_PREFIX}/external/lib/debug/libCalibrationFxp.lib" )
-
-# Import target "libGestureFxp" for configuration "Debug"
-set_property(TARGET libGestureFxp APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
-set_target_properties(libGestureFxp PROPERTIES
-  IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "C"
-  IMPORTED_LOCATION_DEBUG "${_IMPORT_PREFIX}/external/lib/debug/libGestureFxp.lib"
-  )
-
-list(APPEND _IMPORT_CHECK_TARGETS libGestureFxp )
-list(APPEND _IMPORT_CHECK_FILES_FOR_libGestureFxp "${_IMPORT_PREFIX}/external/lib/debug/libGestureFxp.lib" )
-
-# Import target "libOrientationFxp" for configuration "Debug"
-set_property(TARGET libOrientationFxp APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
-set_target_properties(libOrientationFxp PROPERTIES
-  IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "C"
-  IMPORTED_LOCATION_DEBUG "${_IMPORT_PREFIX}/external/lib/debug/libOrientationFxp.lib"
-  )
-
-list(APPEND _IMPORT_CHECK_TARGETS libOrientationFxp )
-list(APPEND _IMPORT_CHECK_FILES_FOR_libOrientationFxp "${_IMPORT_PREFIX}/external/lib/debug/libOrientationFxp.lib" )
-
 # Import target "PocoFoundation_s" for configuration "Debug"
 set_property(TARGET PocoFoundation_s APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
 set_target_properties(PocoFoundation_s PROPERTIES
