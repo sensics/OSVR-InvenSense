@@ -45,11 +45,11 @@ target_link_libraries(com_sensics_InvenSense
     DynamicProtocol
     IDDDeviceEmdWrapIcm20xxx
     IDDHostUtils
-    PocoNet_s
-    PocoUtil_s
-    PocoXML_s
-    PocoFoundation_s
-    PocoJSON_s
+    PocoNetmd
+    PocoUtilmd
+    PocoXMLmd
+    PocoFoundationmd
+    PocoJSONmd
     ws2_32
     iphlpapi
     jsoncpp_lib

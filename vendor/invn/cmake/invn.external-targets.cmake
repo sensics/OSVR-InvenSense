@@ -12,7 +12,7 @@ set(CMAKE_IMPORT_FILE_VERSION 1)
 set(_targetsDefined)
 set(_targetsNotDefined)
 set(_expectedTargets)
-foreach(_expectedTarget PocoFoundation_s PocoJSON_s PocoNet_s PocoUtil_s PocoXML_s)
+foreach(_expectedTarget PocoFoundationmd PocoJSONmd PocoNetmd PocoUtilmd PocoXMLmd)
   list(APPEND _expectedTargets ${_expectedTarget})
   if(NOT TARGET ${_expectedTarget})
     list(APPEND _targetsNotDefined ${_expectedTarget})
@@ -38,20 +38,20 @@ unset(_expectedTargets)
 get_filename_component(_IMPORT_PREFIX "${CMAKE_CURRENT_LIST_FILE}" PATH)
 get_filename_component(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
 
-# Create imported target PocoFoundation_s
-add_library(PocoFoundation_s STATIC IMPORTED)
+# Create imported target PocoFoundationmd
+add_library(PocoFoundationmd STATIC IMPORTED)
 
-# Create imported target PocoJSON_s
-add_library(PocoJSON_s STATIC IMPORTED)
+# Create imported target PocoJSONmd
+add_library(PocoJSONmd STATIC IMPORTED)
 
-# Create imported target PocoNet_s
-add_library(PocoNet_s STATIC IMPORTED)
+# Create imported target PocoNetmd
+add_library(PocoNetmd STATIC IMPORTED)
 
-# Create imported target PocoUtil_s
-add_library(PocoUtil_s STATIC IMPORTED)
+# Create imported target PocoUtilmd
+add_library(PocoUtilmd STATIC IMPORTED)
 
-# Create imported target PocoXML_s
-add_library(PocoXML_s STATIC IMPORTED)
+# Create imported target PocoXMLmd
+add_library(PocoXMLmd STATIC IMPORTED)
 
 if(CMAKE_VERSION VERSION_LESS 2.8.12)
   message(FATAL_ERROR "This file relies on consumers using CMake 2.8.12 or greater.")

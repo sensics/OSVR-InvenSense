@@ -52,14 +52,14 @@ add_library(DynamicProtocol STATIC IMPORTED)
 add_library(IDDHostUtils STATIC IMPORTED)
 
 set_target_properties(IDDHostUtils PROPERTIES
-  INTERFACE_LINK_LIBRARIES "PocoNet_s;PocoUtil_s;PocoXML_s;PocoFoundation_s;EmbUtils"
+  INTERFACE_LINK_LIBRARIES "PocoNetmd;PocoUtilmd;PocoXMLmd;PocoFoundationmd;EmbUtils"
 )
 
 # Create imported target IDDHostAdapter
 add_library(IDDHostAdapter STATIC IMPORTED)
 
 set_target_properties(IDDHostAdapter PROPERTIES
-  INTERFACE_LINK_LIBRARIES "PocoNet_s;PocoUtil_s;PocoXML_s;PocoFoundation_s;IDD;IDDHostUtils"
+  INTERFACE_LINK_LIBRARIES "PocoNetmd;PocoUtilmd;PocoXMLmd;PocoFoundationmd;IDD;IDDHostUtils"
 )
 
 # Create imported target IDD
@@ -73,7 +73,7 @@ add_library(IDDDeviceEmdWrapIcm20xxx STATIC IMPORTED)
 add_library(IDDClient STATIC IMPORTED)
 
 set_target_properties(IDDClient PROPERTIES
-  INTERFACE_LINK_LIBRARIES "IDDDeviceEmdWrapIcm20xxx;PocoNet_s;PocoUtil_s;PocoXML_s;PocoFoundation_s"
+  INTERFACE_LINK_LIBRARIES "IDDDeviceEmdWrapIcm20xxx;PocoNetmd;PocoUtilmd;PocoXMLmd;PocoFoundationmd"
 )
 
 
