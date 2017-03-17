@@ -87,7 +87,7 @@ class InvenSenseDevice : public SensorEventsListener {
         OSVR_OrientationState orientation;
         OSVR_TimeValue timestamp;
         switch (sensorId) {
-        case INV_SENSOR_TYPE_GAME_ROTATION_VECTOR:
+        case INV_SENSOR_TYPE_PRED_QUAT_1:
             orientation.data[0] = event.data.quaternion.quat[0];
             orientation.data[1] = event.data.quaternion.quat[1];
             orientation.data[2] = event.data.quaternion.quat[2];
@@ -104,7 +104,7 @@ class InvenSenseDevice : public SensorEventsListener {
             if (!m_gyro_cal && event.data.gyr.accuracy_flag == 3) {
                 m_gyro_cal = true;
                 // Enable Game Rotation vector at 1KHz.
-                m_controller->enableSensor(INV_SENSOR_TYPE_GAME_ROTATION_VECTOR,
+				m_controller->enableSensor(INV_SENSOR_TYPE_PRED_QUAT_1,
                                            1000);
             }
             // If gyro calibration is done use prediction
@@ -142,9 +142,6 @@ class InvenSenseDevice : public SensorEventsListener {
                 vel.angularVelocity.incrementalRotation.data[Q_Z] =
                     vel_quat[Q_Z];
 
-                vel.linearVelocity.data[0] = event.data.gyr.vect[0];
-                vel.linearVelocity.data[1] = event.data.gyr.vect[1];
-                vel.linearVelocity.data[2] = event.data.gyr.vect[2];
                 osvrTimeValueGetNow(&timestamp);
                 osvrDeviceTrackerSendVelocityTimestamped(m_dev, m_tracker, &vel,
                                                          0, &timestamp);

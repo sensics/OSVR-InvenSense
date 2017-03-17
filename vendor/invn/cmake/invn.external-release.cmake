@@ -38,15 +38,15 @@ set_target_properties(PocoUtilmd PROPERTIES
   IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/external/lib/release/PocoUtilmd.lib"
   )
 
-list(APPEND _IMPORT_CHECK_TARGETS PocoUtil_s )
-list(APPEND _IMPORT_CHECK_FILES_FOR_PocoUtil_s "${_IMPORT_PREFIX}/external/lib/release/PocoUtil_s.lib" )
+list(APPEND _IMPORT_CHECK_TARGETS PocoUtilmd )
+list(APPEND _IMPORT_CHECK_FILES_FOR_PocoUtilmd "${_IMPORT_PREFIX}/external/lib/release/PocoUtilmd.lib" )
 
-# Import target "PocoXML_s" for configuration "Release"
-set_property(TARGET PocoXML_s APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
-set_target_properties(PocoXML_s PROPERTIES
+# Import target "PocoXMLmd" for configuration "Release"
+set_property(TARGET PocoXMLmd APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(PocoXMLmd PROPERTIES
   IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "C"
-  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/external/lib/release/PocoXML_s.lib"
+  IMPORTED_LOCATION_RELEASE "${_IMPORT_PREFIX}/external/lib/release/PocoXMLmd.lib"
   )
 
-list(APPEND _IMPORT_CHECK_TARGETS PocoXML_s )
-list(APPEND _IMPORT_CHECK_FILES_FOR_PocoXML_s "${_IMPORT_PREFIX}/external/lib/release/PocoXML_s.lib" )
+list(APPEND _IMPORT_CHECK_TARGETS PocoXMLmd )
+list(APPEND _IMPORT_CHECK_FILES_FOR_PocoXMLmd "${_IMPORT_PREFIX}/external/lib/release/PocoXMLmd.lib" )

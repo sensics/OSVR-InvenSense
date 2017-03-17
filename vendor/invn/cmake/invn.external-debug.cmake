@@ -38,15 +38,15 @@ set_target_properties(PocoUtilmd PROPERTIES
   IMPORTED_LOCATION_DEBUG "${_IMPORT_PREFIX}/external/lib/debug/PocoUtilmdd.lib"
   )
 
-list(APPEND _IMPORT_CHECK_TARGETS PocoUtil_s )
-list(APPEND _IMPORT_CHECK_FILES_FOR_PocoUtil_s "${_IMPORT_PREFIX}/external/lib/debug/PocoUtil_sd.lib" )
+list(APPEND _IMPORT_CHECK_TARGETS PocoUtilmd )
+list(APPEND _IMPORT_CHECK_FILES_FOR_PocoUtilmd "${_IMPORT_PREFIX}/external/lib/debug/PocoUtilmdd.lib" )
 
-# Import target "PocoXML_s" for configuration "Debug"
-set_property(TARGET PocoXML_s APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
-set_target_properties(PocoXML_s PROPERTIES
+# Import target "PocoXMLmd" for configuration "Debug"
+set_property(TARGET PocoXMLmd APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
+set_target_properties(PocoXMLmd PROPERTIES
   IMPORTED_LINK_INTERFACE_LANGUAGES_DEBUG "C"
-  IMPORTED_LOCATION_DEBUG "${_IMPORT_PREFIX}/external/lib/debug/PocoXML_sd.lib"
+  IMPORTED_LOCATION_DEBUG "${_IMPORT_PREFIX}/external/lib/debug/PocoXMLmdd.lib"
   )
 
-list(APPEND _IMPORT_CHECK_TARGETS PocoXML_s )
-list(APPEND _IMPORT_CHECK_FILES_FOR_PocoXML_s "${_IMPORT_PREFIX}/external/lib/debug/PocoXML_sd.lib" )
+list(APPEND _IMPORT_CHECK_TARGETS PocoXMLmd )
+list(APPEND _IMPORT_CHECK_FILES_FOR_PocoXMLmd "${_IMPORT_PREFIX}/external/lib/debug/PocoXMLmdd.lib" )
