@@ -42,9 +42,16 @@ InvenSenseController::InvenSenseController()
 InvenSenseController::InvenSenseController(const std::string &target,
                                            const std::string &port,
                                            const std::string &adapter)
-    : _serif_instance(0), _serif_instance_ois(0), _serif_instance_i2cslave(0),
-      event_poller(0), watchdog_poller(0),
-      deviceConnected(false), mTarget(target), mPort(port), mAdapter(adapter) {
+    :	_serif_instance(0), 
+		_serif_instance_ois(0),
+		_serif_instance_i2cslave(0),
+		event_poller(0),
+		watchdog_poller(0),
+		deviceConnected(false),
+		mTarget(target),
+		mPort(port),
+		mAdapter(adapter)
+{
 
     OSVR_ReturnCode ret = setupDevice();
 
@@ -196,6 +203,11 @@ OSVR_ReturnCode InvenSenseController::enableSensor(int sensorID,
     device->startSensor(sensorID);
 
     return OSVR_RETURN_SUCCESS;
+}
+
+OSVR_ReturnCode InvenSenseController::setSensorConfig(int sensor, const std::string & settings, const std::string & value){
+	device->setSensorConfig(sensor, settings, value);
+	return OSVR_RETURN_SUCCESS;
 }
 
 void InvenSenseController::waitForDebugger(DeviceClient *device) {

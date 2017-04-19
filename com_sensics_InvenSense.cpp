@@ -56,9 +56,10 @@ static const double invensense_DT = 1.0 / 1000;
 class InvenSenseDevice : public SensorEventsListener {
   public:
     ~InvenSenseDevice() { _dispatcher.unsubscribe(this); }
-    InvenSenseDevice(OSVR_PluginRegContext ctx, InvnCtlPtr controller)
+    InvenSenseDevice(OSVR_PluginRegContext ctx, InvnCtlPtr controller, unsigned long prediction_time, bool prediction_en)
         : m_controller(controller),
-          _dispatcher(controller->getEventDispatcher()), m_gyro_cal(false)
+          _dispatcher(controller->getEventDispatcher()), m_gyro_cal(false),
+		  m_prediction_enabled(prediction_en),m_prediction_time(prediction_time)
 
     {
         osvrTimeValueGetNow(&m_last);
@@ -81,12 +82,21 @@ class InvenSenseDevice : public SensorEventsListener {
     }
 
     OSVR_ReturnCode InvenSenseDevice::update() { return OSVR_RETURN_SUCCESS; }
+	
+	void InvenSenseDevice::setPredictionTime(unsigned long time){
+		m_prediction_time = time;
+	}
+
+	void InvenSenseDevice::setPredictionEnabled(bool enabled){
+		m_prediction_enabled = enabled;
+	}
 
     void InvenSenseDevice::notify(const inv_sensor_event_t &event) {
         int sensorId = (int)(event.sensor & ~INV_SENSOR_TYPE_WU_FLAG);
         OSVR_OrientationState orientation;
         OSVR_TimeValue timestamp;
         switch (sensorId) {
+		case INV_SENSOR_TYPE_GAME_ROTATION_VECTOR:
         case INV_SENSOR_TYPE_PRED_QUAT_1:
             orientation.data[0] = event.data.quaternion.quat[0];
             orientation.data[1] = event.data.quaternion.quat[1];
@@ -104,8 +114,13 @@ class InvenSenseDevice : public SensorEventsListener {
             if (!m_gyro_cal && event.data.gyr.accuracy_flag == 3) {
                 m_gyro_cal = true;
                 // Enable Game Rotation vector at 1KHz.
-				m_controller->enableSensor(INV_SENSOR_TYPE_PRED_QUAT_1,
-                                           1000);
+				if(m_prediction_enabled){
+					std::string payload = "2 " + std::to_string((unsigned long long)m_prediction_time);
+					m_controller->setSensorConfig(INV_SENSOR_TYPE_PRED_QUAT_1, "pred_quat", payload );
+					m_controller->enableSensor(INV_SENSOR_TYPE_PRED_QUAT_1, 1000);
+				}else{
+					m_controller->enableSensor(INV_SENSOR_TYPE_GAME_ROTATION_VECTOR, 1000);
+				}
             }
             // If gyro calibration is done use prediction
             if (m_gyro_cal) {
@@ -160,6 +175,8 @@ class InvenSenseDevice : public SensorEventsListener {
     OSVR_TimeValue m_last;
     SensorEventsDispatcher &_dispatcher;
     bool m_gyro_cal;
+	unsigned long m_prediction_time;
+	bool m_prediction_enabled;
 };
 
 class InvenSensePluginInstantiation {
@@ -185,6 +202,9 @@ class InvenSensePluginInstantiation {
         }
 
         std::string portParam, targetParam, adapterParam;
+		unsigned long prediction_time;
+		bool prediction_enabled;
+
         if (!root.isMember("port")) {
             std::cerr << PREFIX << "Could not find port parameter. Verify that "
                                    "port is specified in the config file"
@@ -219,16 +239,35 @@ class InvenSensePluginInstantiation {
             adapterParam = root["adapter"].asString();
         }
 
-        controller = std::shared_ptr<InvenSenseController>(
-            new InvenSenseController(targetParam, portParam, adapterParam));
+        if (!root.isMember("prediction")) {
+			prediction_enabled = true;
+			prediction_time = 3000;
+            std::cout << PREFIX
+                      << "Could not find prediction param. Enabling prediction with 3ms " << std::endl;
+        } else {
+			Json::Value& prediction = root["prediction"];
+			prediction_enabled = prediction["enabled"].asBool();
+			prediction_time = prediction["time"].asUInt();
+            std::cout << PREFIX
+				<< "Setting up prediction from JSON" << std::endl;
+			std::cout << PREFIX
+                      << "prediction enabled: " << prediction_enabled <<std::endl;
+			std::cout  << PREFIX 
+				<< "prediction time: " << prediction_time << std::endl;
 
-        if (controller->isDeviceConnected()) {
+        }
+
+		controller = std::shared_ptr<InvenSenseController>(
+			new InvenSenseController(targetParam, portParam, adapterParam));
+
+		if (controller->isDeviceConnected()) {
             std::cout << PREFIX << "Detected InvenSense device! " << std::endl;
             m_found = true;
 
             /// Create our device object
+			InvenSenseDevice* pInvnDevice = new InvenSenseDevice(ctx, controller, prediction_time, prediction_enabled);
             osvr::pluginkit::registerObjectForDeletion(
-                ctx, new InvenSenseDevice(ctx, controller));
+                ctx, pInvnDevice);
         } else {
             std::cout << PREFIX << "NOT detected InvenSense tracker "
                       << std::endl;
@@ -241,6 +280,7 @@ class InvenSensePluginInstantiation {
   private:
     InvnCtlPtr controller;
     bool m_found;
+
 };
 } // namespace
 

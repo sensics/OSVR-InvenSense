@@ -5,7 +5,11 @@
 		"params": {
             "target": "emwrapper",
             "adapter": "dummy",
-            "port": "COM13"
+            "port": "COM13",
+			"prediction" :{
+				"enabled": true,
+				"time": 2500
+			}
 		}
 	}],
 	"display": "displays/OSVR_HDK_2_0.json",
