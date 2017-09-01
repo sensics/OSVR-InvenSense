@@ -67,6 +67,10 @@ class InvenSenseController : public DeviceDebuggerHook,
     OSVR_ReturnCode setSensorConfig(int sensor, const std::string & settings, const std::string & value);
 
 	/*
+	@brief Get sesor config by sensor ID in given variable
+	*/
+	OSVR_ReturnCode InvenSenseController::getSensorConfig(int sensor, const std::string & settings, std::string & data);
+	/*
     @brief Implements required function for DeviceErrorHandler
     */
     void handleDeviceError(DeviceClient *device, const std::exception &e);

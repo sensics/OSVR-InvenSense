@@ -210,6 +210,13 @@ OSVR_ReturnCode InvenSenseController::setSensorConfig(int sensor, const std::str
 	return OSVR_RETURN_SUCCESS;
 }
 
+OSVR_ReturnCode InvenSenseController::getSensorConfig(int sensor, const std::string & settings, std::string & data){
+	device->getSensorConfig(sensor, settings, data);
+	return OSVR_RETURN_SUCCESS;
+}
+
+
+
 void InvenSenseController::waitForDebugger(DeviceClient *device) {
     std::cout << "waitForDebugger" << std::endl;
 }
